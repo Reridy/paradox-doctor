@@ -1,88 +1,80 @@
 # Paradox Doctor
 
-Paradox Doctor is a local-first browser diagnostic tool for Paradox modders. The current public beta supports **Hearts of Iron IV** and **Victoria 3** with game-aware diagnostic profiles and a regression-oriented debugging workflow.
+Paradox Doctor is a local-first browser diagnostic workspace for **Hearts of Iron IV** and **Victoria 3** modders.
 
-## Live site
+Live site: `https://reridy.github.io/paradox-doctor/`
 
-`https://reridy.github.io/paradox-doctor/`
+## Product principles
 
-## Current features
+- **Root-cause first:** repeated engine noise is grouped and high-confidence structural findings are prioritized.
+- **Game-aware:** HOI4 and Victoria 3 use different checks and guidance.
+- **Honest uncertainty:** deterministic findings and heuristics are labelled differently; a clean scan is not presented as proof that a mod is bug-free.
+- **Local-first:** selected project files, references and logs stay in the browser in the public beta.
+- **Workflow over warning count:** regression baselines, ignored fingerprints, reference context and exportable reports reduce repeat debugging work.
+
+## Current workflow
+
+1. Select HOI4 or Victoria 3.
+2. Add a project folder, `error.log`, or both.
+3. Optionally load a local vanilla/dependency reference and current game version.
+4. Run diagnosis.
+5. Start with likely root causes, then review lower-confidence warnings.
+6. Save a good result as a local regression baseline or export JSON/Markdown.
+
+## Key checks
 
 ### Shared
-- Choose HOI4 or Victoria 3 before scanning.
-- Scan individual text files or a whole mod folder in the browser.
-- Upload or paste `error.log`.
-- Collapse repeated log patterns and prioritize likely root causes.
-- Brace-balance and localization-format checks.
-- Cross-file duplicate localization detection.
-- Severity filtering, result search, local scan-history metadata.
-- Export Markdown / JSON diagnostic reports.
-- Load a previous JSON report as a **baseline** and show only newly introduced findings.
-- Locally ignore known false-positive patterns and restore them later.
-- Guided "Next action" hints on findings.
-- Optional local **reference folder** for vanilla/dependency path and localization collision checks.
-- `descriptor.mod` / `.mod` supported-version diagnostics, with optional comparison to a user-entered current game version.
-- Game-specific troubleshooting guides and an ongoing modder-demand survey.
+- Brace balance with strings/comments excluded from brace counting.
+- Localization language-header and entry-shape checks.
+- UTF-8 BOM information read from the raw bytes instead of decoded text.
+- Duplicate localization keys inside one file and across selected files.
+- `supported_version` comparison when a game version is supplied.
+- Repeated `error.log` grouping with source-location extraction when possible.
+- Optional exact-path/localization collision context against a local reference folder.
 
 ### Hearts of Iron IV
-- Focus ID and focus-localization checks.
-- Missing focus-prerequisite reference checks.
-- Duplicate state ID checks.
-- Provinces assigned to multiple states.
-- Duplicate strategic-region province membership.
-- Provinces present in selected states but absent from selected strategic-region definitions.
-- Stronger warnings for newly added/incomplete states without building data.
-- Common map/state structure warnings.
-- `unexpected token`, unknown/invalid effects, references and map-related error-log triage.
+- Duplicate focus IDs and event IDs.
+- Missing focus prerequisite references as dependency-aware heuristics.
+- Duplicate state IDs and provinces assigned to multiple selected states.
+- Duplicate province membership across selected strategic-region files.
+- Conservative state/category/history/buildings review items.
 
 ### Victoria 3
-- Jomini unset/wrong-scope and event-target log grouping.
-- Journal-entry duplicate key and localization heuristics.
-- Duplicate event ID checks.
-- Journal/event reference heuristics.
-- Suspicious `timeout = 0` journal-entry warning.
-- Victoria 3 localization-path heuristics.
-- State-region key and repeated province-membership checks.
-- Map/state and missing-reference log triage.
+- Duplicate journal-entry and event IDs.
+- Journal/event reference heuristics with optional dependency reference lookup.
+- Suspicious `timeout = 0` as a heuristic.
+- Duplicate state-region keys and repeated selected province membership.
+- Scope/event-target and map/state log triage.
 
-## Why v3 focuses on workflow
+## Regression workflow
 
-Public modding support threads show two different needs:
+Each game can store one local baseline made of finding fingerprints. A later scan can show only findings that are new relative to that baseline. Ignored-finding fingerprints are also stored locally and separately by game.
 
-1. Beginners often need plain-language guidance and a concrete next step, not more raw validator output.
-2. Experienced modders need to distinguish **new regressions** from known warnings and intentional overrides, while controlling false positives.
+## Repository quality
 
-The v3 demand review is documented in `research-2026-09-08.md`.
-
-## Architecture and privacy
-
-The site is intentionally static HTML/CSS/JavaScript so it can run on GitHub Pages without a backend. Project source files, optional reference files, baselines, and logs are processed on the user's device in the current version.
-
-Only small preferences/metadata such as the selected game, ignored issue fingerprints, and recent scan summaries may be stored in browser local storage.
-
-The scanner is a practical heuristic diagnostic assistant, not a complete replacement for CWTools, Tiger, Paradox debug mode, or engine map validation. High-confidence deterministic conflicts are prioritized above lower-confidence warnings.
-
-## Run locally
-
-No build step is required. Open `index.html`, or serve the repository with a simple static server:
+The site has no build step. GitHub Actions runs:
 
 ```bash
-python -m http.server 8000
+node --check app-core.js && node --check app-game-checks.js && node --check app-log-runner.js && node --check app-ui.js
+node scripts/check-site.mjs
 ```
 
-Then open `http://localhost:8000`.
+The static checker verifies internal file targets and duplicate HTML IDs.
 
-## GitHub Pages
+## Architecture
 
-Pages can deploy directly from `main` and `/ (root)`.
+- `index.html` — main diagnostic workspace
+- `app-core.js` / `app-game-checks.js` / `app-log-runner.js` / `app-ui.js` — one cohesive scanner split by responsibility: state/input, analyzers, and result/workflow UI
+- `style.css` — shared responsive styles
+- `guides.html` + `errors/` — user-facing troubleshooting content
+- `games/` — game-specific landing pages
+- `tools.html` / `tools.js` — non-core utilities such as HOI4 year shifting
+- `privacy.html` — local-data behavior
+- `pricing.html` — product roadmap; there is no paid plan today
 
-## Feedback / demand survey
+## Limitations
 
-The ongoing product-demand survey is tracked in GitHub issue #5. Reports of false positives, missed root causes, confusing explanations, and workflows that would save real time should determine future priorities.
-
-## Roadmap
-
-Strong candidates after v3 are safe suggested fixes with diffs, project snapshots, compatibility comparison between two mods, deeper reference graphs, game-version-aware validation packs, and CI-friendly regression reports.
+Paradox Doctor is a heuristic diagnostic assistant, not a full engine parser and not a replacement for Paradox debug mode, CWTools, Tiger or direct game validation. Partial folder selections can only be checked against the context actually supplied.
 
 ## Disclaimer
 
