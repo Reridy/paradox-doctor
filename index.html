@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Paradox Doctor diagnoses common Hearts of Iron IV modding errors directly in your browser.">
+  <title>Paradox Doctor — HOI4 Mod Diagnostics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#">Paradox Doctor <span>alpha</span></a>
+    <nav><a href="#scanner">Scanner</a><a href="#about">About</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">HOI4 MOD DIAGNOSTICS</p>
+      <h1>Your mod is broken.<br><span>Find out why.</span></h1>
+      <p class="hero-copy">Scan localization files and error logs, spot suspicious dates, and turn Paradox error messages into actionable fixes. No upload required.</p>
+      <a class="primary-btn" href="#scanner">Diagnose my mod</a>
+      <p class="privacy">🔒 Files are analyzed locally in your browser.</p>
+    </section>
+
+    <section id="scanner" class="scanner-shell">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="files">Mod files</button>
+        <button class="tab" data-tab="log">error.log</button>
+        <button class="tab" data-tab="years">Year shift</button>
+      </div>
+
+      <div id="filesPanel" class="panel active">
+        <label id="dropZone" class="drop-zone">
+          <input id="fileInput" type="file" multiple accept=".txt,.yml,.yaml,.log">
+          <strong>Drop HOI4 text files here</strong>
+          <span>or click to select .txt, .yml and .log files</span>
+        </label>
+        <button id="scanFilesBtn" class="primary-btn wide" disabled>Scan selected files</button>
+      </div>
+
+      <div id="logPanel" class="panel">
+        <label for="logInput">Paste your HOI4 <code>error.log</code></label>
+        <textarea id="logInput" placeholder="[21:04:27][no_game_date][localize.cpp:658]: l_korean: Duplicate localization found, key: militarism_desc..."></textarea>
+        <button id="scanLogBtn" class="primary-btn wide">Analyze error.log</button>
+      </div>
+
+      <div id="yearsPanel" class="panel">
+        <div class="year-controls">
+          <label>Shift years by <input id="yearOffset" type="number" value="85"></label>
+          <label>Minimum year <input id="yearMin" type="number" value="1900"></label>
+          <label>Maximum year <input id="yearMax" type="number" value="2099"></label>
+        </div>
+        <textarea id="yearInput" placeholder="Paste Paradox script here, for example:&#10;year = 1936&#10;date > 1937.1.1"></textarea>
+        <button id="transformYearsBtn" class="primary-btn wide">Preview transformed script</button>
+        <textarea id="yearOutput" readonly placeholder="Preview appears here"></textarea>
+        <button id="copyYearsBtn" class="secondary-btn wide" disabled>Copy transformed text</button>
+      </div>
+    </section>
+
+    <section id="results" class="results hidden" aria-live="polite">
+      <div class="results-head">
+        <div>
+          <p class="eyebrow">MOD HEALTH</p>
+          <h2 id="healthScore">100 / 100</h2>
+        </div>
+        <div class="counts"><span id="errorCount">0 errors</span><span id="warningCount">0 warnings</span><span id="infoCount">0 notes</span></div>
+      </div>
+      <div id="resultList" class="result-list"></div>
+    </section>
+
+    <section id="about" class="about">
+      <div><p class="eyebrow">WHY PARADOX DOCTOR</p><h2>Diagnosis, not another editor.</h2></div>
+      <p>Paradox Doctor is focused on explaining what went wrong and where. The current alpha targets Hearts of Iron IV and will expand to deeper cross-file validation over time.</p>
+    </section>
+  </main>
+
+  <footer><span>Paradox Doctor</span><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></footer>
+  <script src="script.js"></script>
+</body>
+</html>
