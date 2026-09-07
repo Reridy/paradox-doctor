@@ -1,32 +1,53 @@
 # Paradox Doctor
 
-Paradox Doctor is a browser-based diagnostic tool for Paradox modding. The first alpha focuses on **Hearts of Iron IV** and aims to turn common mod errors into understandable, actionable fixes.
+Paradox Doctor is a local-first browser diagnostic tool for Paradox modders. The current public beta supports **Hearts of Iron IV** and **Victoria 3** with different game-aware diagnostic profiles.
 
-## MVP features
+## Live site
 
-- Scan `.yml` localization files for:
-  - duplicate keys in the same file
-  - malformed language headers
-  - malformed localization entries
-  - suspicious unquoted values
-  - UTF-8 BOM warning
-- Paste or load `error.log` and classify common problems such as:
-  - duplicate localization
-  - unexpected tokens
-  - unknown effects/triggers
-  - missing references
-- Scan `.txt` scripts for simple duplicate-ID patterns and suspicious historical years.
-- Shift timeline years by a configurable offset with a preview before copying.
-- Everything runs locally in the browser. Files are not uploaded by the current MVP.
+`https://reridy.github.io/paradox-doctor/`
+
+## Current features
+
+### Shared
+- Choose HOI4 or Victoria 3 before scanning.
+- Scan individual text files or a whole mod folder in the browser.
+- Upload or paste `error.log`.
+- Collapse repeated log patterns and prioritize likely root causes.
+- Brace-balance and localization-format checks.
+- Cross-file duplicate localization detection.
+- Severity filtering, result search, local scan-history metadata.
+- Export Markdown / JSON diagnostic reports.
+- Game-specific troubleshooting guides.
+
+### Hearts of Iron IV
+- Focus ID and focus-localization checks.
+- Duplicate state ID checks.
+- Provinces assigned to multiple states.
+- Duplicate strategic-region province membership.
+- Common map/state structure warnings.
+- `unexpected token`, unknown/invalid effects, references and map-related error-log triage.
+
+### Victoria 3
+- Jomini unset/wrong-scope and event-target log grouping.
+- Journal-entry duplicate key and localization heuristics.
+- Duplicate event ID checks.
+- Victoria 3 localization-path heuristics.
+- State-region key and repeated province-membership checks.
+- Map/state and missing-reference log triage.
+
+## Architecture
+
+The site is intentionally static HTML/CSS/JavaScript so it can run on GitHub Pages without a backend. Project source files remain on the user's device in the current version.
+
+The scanner is a practical heuristic diagnostic assistant, not a complete replacement for CWTools, Tiger, Paradox debug mode, or engine map validation. High-confidence deterministic conflicts are prioritized above lower-confidence warnings.
+
+## Research direction
+
+`research-2026-09-07.md` records the public modder pain points that informed the HOI4 + Victoria 3 expansion. The product direction is to focus on zero-install diagnosis and plain-language triage rather than becoming another full content editor.
 
 ## Run locally
 
-No build step is required.
-
-1. Clone or download the repository.
-2. Open `index.html` in a browser, or serve the folder with any simple static web server.
-
-Example with Python:
+No build step is required. Open `index.html`, or serve the repository with a simple static server:
 
 ```bash
 python -m http.server 8000
@@ -34,33 +55,13 @@ python -m http.server 8000
 
 Then open `http://localhost:8000`.
 
-## Deploy with GitHub Pages
+## GitHub Pages
 
-This project is intentionally static and can be hosted for free using GitHub Pages.
-
-1. Merge the MVP branch into `main`.
-2. Open the repository on GitHub.
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**.
-5. Select `main` and `/ (root)`.
-6. Save.
-
-For this repository, the project-site URL should normally be:
-
-`https://reridy.github.io/paradox-doctor/`
-
-## Current limitations
-
-This is an alpha heuristic scanner, not a complete Clausewitz/Jomini parser. Some findings may be false positives, and passing the scan does not prove a mod is error-free. Cross-file references, full focus/event/idea parsing, ZIP/folder-wide analysis, and safe automatic fixes are planned for later versions.
+Pages can deploy directly from `main` and `/ (root)`.
 
 ## Roadmap
 
-- Cross-file duplicate IDs and references
-- Missing localization detection for focuses, ideas, events and decisions
-- Folder / ZIP scanning
-- Better `error.log` parser with categorized explanations
-- Safe automatic fixes with downloadable patched files
-- Expansion to other Paradox titles
+Future work should be driven by user feedback and measurable demand. Strong candidates include safe suggested fixes with diffs, project snapshots, compatibility comparison between mods, deeper reference graphs, and game-version-aware validation.
 
 ## Disclaimer
 
