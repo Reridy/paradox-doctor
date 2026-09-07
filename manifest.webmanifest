@@ -1,0 +1,9 @@
+{
+  "name": "Paradox Doctor",
+  "short_name": "Paradox Doctor",
+  "description": "Browser-based HOI4 mod diagnostics",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d1016",
+  "theme_color": "#0d1016"
+}
