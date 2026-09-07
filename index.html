@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Paradox Doctor is a free local-first mod diagnostic tool for Hearts of Iron IV and Victoria 3. Scan mod folders and error.log for common modding mistakes.">
+  <meta name="description" content="Paradox Doctor is a free local-first mod diagnostic tool for Hearts of Iron IV and Victoria 3. Scan mod folders and error.log, compare runs, suppress known noise, and prioritize likely root causes.">
   <meta property="og:title" content="Paradox Doctor — HOI4 & Victoria 3 Mod Diagnostics">
   <meta property="og:description" content="Choose your Paradox game, scan a mod folder and error.log locally, and get prioritized explanations for likely root causes.">
   <meta property="og:type" content="website">
@@ -37,7 +37,7 @@
   </div>
 
   <header class="site-header">
-    <a class="brand" href="./">Paradox Doctor <span>v2 beta</span></a>
+    <a class="brand" href="./">Paradox Doctor <span>v3 beta</span></a>
     <div class="header-actions">
       <label class="game-switch-wrap"><span>Game</span><select id="gameSwitch" aria-label="Select game"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label>
       <nav><a href="#scanner">Scanner</a><a href="#guides">Guides</a><a href="pricing.html">Roadmap</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav>
@@ -57,8 +57,8 @@
     <section class="trust-strip" aria-label="Highlights">
       <div><strong>Game-aware</strong><span>HOI4 + Victoria 3 profiles</span></div>
       <div><strong>Root-cause first</strong><span>Repeated log noise collapsed</span></div>
-      <div><strong>Folder + log</strong><span>Cross-file context</span></div>
-      <div><strong>Shareable</strong><span>Markdown + JSON reports</span></div>
+      <div><strong>Regression aware</strong><span>Compare with a previous JSON report</span></div>
+      <div><strong>Local reference</strong><span>Optional vanilla/dependency comparison</span></div>
     </section>
 
     <section id="scanner" class="scanner-shell">
@@ -143,7 +143,8 @@
 
   <dialog id="tipsDialog" class="tips-dialog"><div class="dialog-head"><h2>Finding error.log</h2><button id="closeTips" type="button" aria-label="Close">×</button></div><div id="tipsDialogContent"></div></dialog>
 
-  <footer><span>© 2026 Paradox Doctor · Unofficial community tool, not affiliated with Paradox Interactive.</span><span class="footer-links"><a href="privacy.html">Privacy</a><a href="research-2026-09-07.md">Research note</a><a href="https://github.com/Reridy/paradox-doctor/issues/new" target="_blank" rel="noopener">Feedback</a></span></footer>
+  <footer><span>© 2026 Paradox Doctor · Unofficial community tool, not affiliated with Paradox Interactive.</span><span class="footer-links"><a href="privacy.html">Privacy</a><a href="research-2026-09-07.md">Research note</a><a href="https://github.com/Reridy/paradox-doctor/issues/5" target="_blank" rel="noopener">Modder survey</a></span></footer>
   <script src="script.js"></script>
+  <script src="workflow-v3.js"></script>
 </body>
 </html>
