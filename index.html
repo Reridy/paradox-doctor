@@ -3,154 +3,147 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Free browser-based HOI4 mod diagnostic tool. Scan mod folders, localization files and error.log for duplicate keys, broken syntax, suspicious IDs and more.">
-  <meta name="keywords" content="HOI4 modding tool, HOI4 error log, Hearts of Iron IV mod checker, HOI4 localization error, Paradox modding">
-  <meta property="og:title" content="Paradox Doctor — Find HOI4 mod errors fast">
-  <meta property="og:description" content="Scan HOI4 mod files locally in your browser and turn cryptic errors into actionable fixes.">
+  <meta name="description" content="Paradox Doctor is a free local-first mod diagnostic tool for Hearts of Iron IV and Victoria 3. Scan mod folders and error.log for common modding mistakes.">
+  <meta property="og:title" content="Paradox Doctor — HOI4 & Victoria 3 Mod Diagnostics">
+  <meta property="og:description" content="Choose your Paradox game, scan a mod folder and error.log locally, and get prioritized explanations for likely root causes.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://reridy.github.io/paradox-doctor/">
   <link rel="canonical" href="https://reridy.github.io/paradox-doctor/">
   <link rel="manifest" href="manifest.webmanifest">
-  <title>Paradox Doctor — Free HOI4 Mod Error Scanner</title>
+  <title>Paradox Doctor — HOI4 & Victoria 3 Mod Diagnostics</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-game="hoi4">
+  <div id="gameGate" class="game-gate" aria-modal="true" role="dialog" aria-labelledby="gameGateTitle">
+    <div class="game-gate-card">
+      <p class="eyebrow">PARADOX DOCTOR</p>
+      <h1 id="gameGateTitle">Which game are you modding?</h1>
+      <p class="muted">The scanner changes its rules, error explanations and guides for each game.</p>
+      <div class="game-choice-grid">
+        <button class="game-choice" data-game-choice="hoi4" type="button">
+          <span class="game-mark">HOI4</span>
+          <strong>Hearts of Iron IV</strong>
+          <small>Focus trees · localization · script · map/state diagnostics</small>
+        </button>
+        <button class="game-choice" data-game-choice="vic3" type="button">
+          <span class="game-mark">VIC3</span>
+          <strong>Victoria 3</strong>
+          <small>Jomini scope · journal/event · localization · state diagnostics</small>
+        </button>
+      </div>
+      <label class="remember-choice"><input id="rememberGame" type="checkbox" checked> Remember my choice on this device</label>
+      <p class="tiny muted">You can switch games at any time from the header.</p>
+    </div>
+  </div>
+
   <header class="site-header">
-    <a class="brand" href="./">Paradox Doctor <span>beta</span></a>
-    <nav>
-      <a href="#scanner">Scanner</a>
-      <a href="#guides">Guides</a>
-      <a href="pricing.html">Pro</a>
-      <a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a>
-    </nav>
+    <a class="brand" href="./">Paradox Doctor <span>v2 beta</span></a>
+    <div class="header-actions">
+      <label class="game-switch-wrap"><span>Game</span><select id="gameSwitch" aria-label="Select game"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label>
+      <nav><a href="#scanner">Scanner</a><a href="#guides">Guides</a><a href="pricing.html">Roadmap</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav>
+    </div>
   </header>
 
   <main>
     <section class="hero">
-      <p class="eyebrow">FREE HOI4 MOD DIAGNOSTICS</p>
-      <h1>Your mod is broken.<br><span>Find out why.</span></h1>
-      <p class="hero-copy">Scan a whole mod folder, localization files, or <code>error.log</code>. Paradox Doctor explains common failures and points you to the file and line — without uploading your files.</p>
-      <div class="hero-actions">
-        <a class="primary-btn" href="#scanner">Scan my mod</a>
-        <a class="secondary-btn" href="#guides">Read error guides</a>
-      </div>
-      <p class="privacy">🔒 Local-first: file contents stay in your browser.</p>
+      <div class="game-pill"><span id="heroGameShort">HOI4</span><span id="heroGameName">Hearts of Iron IV</span></div>
+      <p class="eyebrow">LOCAL-FIRST MOD DIAGNOSTICS</p>
+      <h1>Stop guessing.<br><span>Find the likely root cause.</span></h1>
+      <p id="heroCopy" class="hero-copy">Scan a Hearts of Iron IV mod folder together with error.log. Paradox Doctor prioritizes common focus, localization, scope and map mistakes instead of dumping raw engine noise back at you.</p>
+      <div class="hero-actions"><a class="primary-btn" href="#scanner">Diagnose my mod</a><button id="changeGameHero" class="secondary-btn" type="button">Change game</button></div>
+      <p class="privacy">🔒 Selected files are analyzed in your browser. This version does not upload mod contents.</p>
     </section>
 
-    <section class="trust-strip" aria-label="Product highlights">
-      <div><strong>0 uploads</strong><span>Local browser analysis</span></div>
-      <div><strong>Folder scan</strong><span>Cross-file checks</span></div>
-      <div><strong>Exportable</strong><span>Markdown + JSON reports</span></div>
-      <div><strong>Free</strong><span>No account required</span></div>
+    <section class="trust-strip" aria-label="Highlights">
+      <div><strong>Game-aware</strong><span>HOI4 + Victoria 3 profiles</span></div>
+      <div><strong>Root-cause first</strong><span>Repeated log noise collapsed</span></div>
+      <div><strong>Folder + log</strong><span>Cross-file context</span></div>
+      <div><strong>Shareable</strong><span>Markdown + JSON reports</span></div>
     </section>
 
     <section id="scanner" class="scanner-shell">
+      <div class="scanner-head">
+        <div><p class="eyebrow">DIAGNOSTIC WORKSPACE</p><h2><span id="scannerGameName">Hearts of Iron IV</span> scanner</h2></div>
+        <div id="profileBadges" class="profile-badges"></div>
+      </div>
       <div class="tabs" role="tablist" aria-label="Scanner modes">
-        <button class="tab active" data-tab="files" type="button">Mod files</button>
-        <button class="tab" data-tab="log" type="button">error.log</button>
-        <button class="tab" data-tab="years" type="button">Year shift</button>
+        <button class="tab active" data-tab="project" type="button">1. Mod project</button>
+        <button class="tab" data-tab="log" type="button">2. error.log</button>
+        <button class="tab" data-tab="tools" type="button">3. Utilities</button>
       </div>
 
-      <div id="filesPanel" class="panel active">
+      <div id="projectPanel" class="panel active">
         <div class="upload-grid">
           <label id="dropZone" class="drop-zone">
-            <input id="fileInput" type="file" multiple accept=".txt,.yml,.yaml,.log,.mod">
-            <strong>Drop mod text files here</strong>
-            <span>or click to choose multiple files</span>
+            <input id="fileInput" type="file" multiple accept=".txt,.yml,.yaml,.log,.mod,.json,.gui,.asset,.csv">
+            <span class="upload-icon">＋</span><strong>Drop mod files here</strong><span>or click to choose multiple text-based files</span>
           </label>
           <label class="drop-zone folder-zone">
             <input id="folderInput" type="file" webkitdirectory directory multiple>
-            <strong>Choose a whole mod folder</strong>
-            <span>Best for cross-file duplicate and localization checks</span>
+            <span class="upload-icon">▣</span><strong>Choose the whole mod folder</strong><span>Recommended: enables cross-file and path-aware checks</span>
           </label>
         </div>
-        <div id="fileStatus" class="file-status">No files selected</div>
-        <button id="scanFilesBtn" class="primary-btn wide" type="button" disabled>Scan selected files</button>
+        <div id="fileStatus" class="file-status">No project files selected</div>
+        <div id="selectionSummary" class="selection-summary hidden"></div>
+        <button id="scanFilesBtn" class="primary-btn wide" type="button" disabled>Run project diagnosis</button>
       </div>
 
       <div id="logPanel" class="panel">
-        <label id="logDropZone" class="drop-zone compact-drop-zone">
-          <input id="logFileInput" type="file" accept=".log,.txt,text/plain">
-          <strong>Drop error.log here</strong>
-          <span>or click to choose the file from your computer</span>
-        </label>
-        <div id="logFileStatus" class="file-status" aria-live="polite">No log file selected</div>
+        <div class="log-grid">
+          <label id="logDropZone" class="drop-zone compact-drop-zone">
+            <input id="logFileInput" type="file" accept=".log,.txt,text/plain">
+            <span class="upload-icon">↥</span><strong>Drop error.log here</strong><span>or click to select it</span>
+          </label>
+          <div class="log-help"><strong>Best results</strong><p>Use a fresh log created after reproducing the problem once. If you also select the mod folder, Paradox Doctor can connect log paths and IDs to your project.</p><button id="showLogTips" class="text-btn" type="button">Where is error.log?</button></div>
+        </div>
+        <div id="logFileStatus" class="file-status">No log file selected</div>
         <div class="or-divider"><span>or paste it manually</span></div>
-        <label for="logInput">HOI4 <code>error.log</code> contents</label>
-        <textarea id="logInput" spellcheck="false" placeholder="[21:04:27][no_game_date][localize.cpp:658]: l_korean: Duplicate localization found, key: militarism_desc..."></textarea>
+        <textarea id="logInput" spellcheck="false" placeholder="Paste error.log here..."></textarea>
         <button id="scanLogBtn" class="primary-btn wide" type="button">Analyze error.log</button>
       </div>
 
-      <div id="yearsPanel" class="panel">
-        <div class="year-controls">
-          <label>Shift years by <input id="yearOffset" type="number" value="85"></label>
-          <label>Minimum year <input id="yearMin" type="number" value="1900"></label>
-          <label>Maximum year <input id="yearMax" type="number" value="2099"></label>
+      <div id="toolsPanel" class="panel">
+        <div class="tool-grid">
+          <section class="tool-card" id="yearTool"><p class="eyebrow">TIMELINE</p><h3>Year shift</h3><p>Shift likely scripted years without blindly replacing every four-digit number.</p><div class="year-controls"><label>Offset<input id="yearOffset" type="number" value="85"></label><label>Min year<input id="yearMin" type="number" value="1900"></label><label>Max year<input id="yearMax" type="number" value="2099"></label></div><textarea id="yearInput" spellcheck="false" placeholder="Paste script here..."></textarea><button id="transformYearsBtn" class="secondary-btn wide" type="button">Preview transformed script</button><textarea id="yearOutput" readonly spellcheck="false" placeholder="Preview appears here"></textarea><button id="copyYearsBtn" class="secondary-btn wide" type="button" disabled>Copy transformed text</button></section>
+          <section class="tool-card"><p class="eyebrow">DEBUGGING</p><h3>Reproduction checklist</h3><ol id="reproChecklist" class="checklist"></ol><button id="copyChecklistBtn" class="secondary-btn wide" type="button">Copy checklist</button></section>
         </div>
-        <textarea id="yearInput" spellcheck="false" placeholder="Paste Paradox script here, for example:&#10;year = 1936&#10;date > 1937.1.1"></textarea>
-        <button id="transformYearsBtn" class="primary-btn wide" type="button">Preview transformed script</button>
-        <textarea id="yearOutput" readonly spellcheck="false" placeholder="Preview appears here"></textarea>
-        <button id="copyYearsBtn" class="secondary-btn wide" type="button" disabled>Copy transformed text</button>
       </div>
+
+      <div id="scanProgress" class="scan-progress hidden" aria-live="polite"><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div><div class="progress-meta"><span id="progressText">Preparing…</span><button id="cancelScanBtn" class="text-btn" type="button">Cancel</button></div></div>
     </section>
 
     <section id="results" class="results hidden" aria-live="polite">
       <div class="results-head">
-        <div>
-          <p class="eyebrow">MOD HEALTH</p>
-          <h2 id="healthScore">100 / 100</h2>
-          <p id="scanSummary" class="muted"></p>
-        </div>
-        <div class="counts"><span id="errorCount">0 errors</span><span id="warningCount">0 warnings</span><span id="infoCount">0 notes</span></div>
+        <div><p class="eyebrow">DIAGNOSIS</p><div class="score-line"><h2 id="healthScore">100</h2><span>/100</span></div><p id="scanSummary" class="muted"></p></div>
+        <div class="counts"><span id="criticalCount">0 likely roots</span><span id="errorCount">0 errors</span><span id="warningCount">0 warnings</span><span id="infoCount">0 notes</span></div>
       </div>
-      <div class="result-actions">
-        <button id="exportMarkdownBtn" class="secondary-btn" type="button">Export Markdown</button>
-        <button id="exportJsonBtn" class="secondary-btn" type="button">Export JSON</button>
-        <button id="copyReportBtn" class="secondary-btn" type="button">Copy summary</button>
-      </div>
-      <div class="result-filters" role="group" aria-label="Result filters">
-        <button class="filter active" data-filter="all" type="button">All</button>
-        <button class="filter" data-filter="error" type="button">Errors</button>
-        <button class="filter" data-filter="warning" type="button">Warnings</button>
-        <button class="filter" data-filter="info" type="button">Notes</button>
+      <div id="nextSteps" class="next-steps hidden"></div>
+      <div class="result-toolbar">
+        <div class="result-filters" role="group" aria-label="Result filters"><button class="filter active" data-filter="all" type="button">All</button><button class="filter" data-filter="root" type="button">Likely roots</button><button class="filter" data-filter="error" type="button">Errors</button><button class="filter" data-filter="warning" type="button">Warnings</button><button class="filter" data-filter="info" type="button">Notes</button></div>
+        <label class="search-results">Search<input id="resultSearch" type="search" placeholder="file, key, error..."></label>
       </div>
       <div id="resultList" class="result-list"></div>
+      <div class="result-actions"><button id="exportMarkdownBtn" class="secondary-btn" type="button">Export Markdown</button><button id="exportJsonBtn" class="secondary-btn" type="button">Export JSON</button><button id="copyReportBtn" class="secondary-btn" type="button">Copy summary</button></div>
     </section>
 
-    <section id="recent" class="section-card hidden">
-      <div class="section-heading"><div><p class="eyebrow">LOCAL HISTORY</p><h2>Recent scans</h2></div><button id="clearHistoryBtn" class="text-btn" type="button">Clear history</button></div>
-      <div id="historyList" class="history-list"></div>
-      <p class="muted small">Only scan counts and timestamps are stored locally. Your mod file contents are not saved.</p>
-    </section>
+    <section id="recent" class="section-card hidden"><div class="section-heading"><div><p class="eyebrow">LOCAL HISTORY</p><h2>Recent diagnoses</h2></div><button id="clearHistoryBtn" class="text-btn" type="button">Clear</button></div><div id="historyList" class="history-list"></div><p class="muted small">Only summary metadata is stored locally, not your file contents.</p></section>
 
     <section id="guides" class="content-section">
-      <div class="section-heading"><div><p class="eyebrow">ERROR LIBRARY</p><h2>Fix common HOI4 errors</h2></div><p class="muted">Search-friendly guides bring modders here when they hit an error.</p></div>
-      <div class="guide-grid">
-        <a class="guide-card" href="errors/duplicate-localization.html"><span>Localization</span><h3>Duplicate localization found</h3><p>Why duplicate keys happen and how to locate both definitions.</p></a>
-        <a class="guide-card" href="errors/unexpected-token.html"><span>Parser</span><h3>Unexpected token</h3><p>Track malformed braces, equals signs and nearby syntax errors.</p></a>
-        <a class="guide-card" href="errors/unknown-effect.html"><span>Scripting</span><h3>Unknown effect or trigger</h3><p>Check spelling, scope, game version and dependencies.</p></a>
-      </div>
+      <div class="section-heading"><div><p class="eyebrow">GAME-SPECIFIC HELP</p><h2 id="guideHeading">Common HOI4 problems</h2></div><p class="muted">Built around recurring community questions, not generic programming advice.</p></div>
+      <div id="guideGrid" class="guide-grid"></div>
     </section>
 
-    <section class="pro-section">
-      <div>
-        <p class="eyebrow">SUSTAINABLE DEVELOPMENT</p>
-        <h2>Free scanner first. Pro tools later.</h2>
-        <p>Paradox Doctor stays useful without an account. Planned Pro features focus on time-saving workflows such as safe automatic fixes, deeper references, saved projects and advanced reports.</p>
-      </div>
-      <a class="primary-btn" href="pricing.html">See the roadmap</a>
+    <section class="research-section">
+      <div><p class="eyebrow">BUILT FROM MODDER PAIN POINTS</p><h2>Why these checks?</h2><p id="researchCopy">HOI4 modders repeatedly run into cascaded parser errors, partial focus-tree loading, localization mistakes and map/state failures. The scanner prioritizes those patterns and marks heuristic checks clearly.</p></div>
+      <div class="research-points" id="researchPoints"></div>
     </section>
 
-    <section id="about" class="about">
-      <div><p class="eyebrow">WHY PARADOX DOCTOR</p><h2>Diagnosis, not another editor.</h2></div>
-      <div><p>Paradox Doctor focuses on explaining what went wrong and where. The current beta targets Hearts of Iron IV, with a path toward deeper Paradox mod validation.</p><p><a class="inline-link" href="https://github.com/Reridy/paradox-doctor/issues/new" target="_blank" rel="noopener">Report a bug or request a feature →</a></p></div>
-    </section>
+    <section class="pro-section"><div><p class="eyebrow">PRODUCT ROADMAP</p><h2>Free diagnosis. Paid time-saving, only if it becomes good enough.</h2><p>The free scanner remains useful without an account. Future paid features should earn their price through safe auto-fixes, project snapshots, compatibility comparisons and deeper game-version-aware validation.</p></div><a class="primary-btn" href="pricing.html">See roadmap</a></section>
   </main>
 
-  <footer>
-    <span>© 2026 Paradox Doctor · Unofficial community tool.</span>
-    <span class="footer-links"><a href="privacy.html">Privacy</a><a href="pricing.html">Pro roadmap</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></span>
-  </footer>
+  <dialog id="tipsDialog" class="tips-dialog"><div class="dialog-head"><h2>Finding error.log</h2><button id="closeTips" type="button" aria-label="Close">×</button></div><div id="tipsDialogContent"></div></dialog>
+
+  <footer><span>© 2026 Paradox Doctor · Unofficial community tool, not affiliated with Paradox Interactive.</span><span class="footer-links"><a href="privacy.html">Privacy</a><a href="research-2026-09-07.md">Research note</a><a href="https://github.com/Reridy/paradox-doctor/issues/new" target="_blank" rel="noopener">Feedback</a></span></footer>
   <script src="script.js"></script>
 </body>
 </html>
