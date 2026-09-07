@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reridy.github.io/paradox-doctor/sitemap.xml
