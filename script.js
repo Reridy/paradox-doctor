@@ -1,14 +1,23 @@
-const state={files:[],issues:[]};
+const state={files:[],issues:[],logFile:null};
 const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
 const fileInput=qs('#fileInput'),dropZone=qs('#dropZone'),scanFilesBtn=qs('#scanFilesBtn');
+const logFileInput=qs('#logFileInput'),logDropZone=qs('#logDropZone'),logFileStatus=qs('#logFileStatus'),logInput=qs('#logInput');
 qsa('.tab').forEach(tab=>tab.addEventListener('click',()=>{qsa('.tab').forEach(t=>t.classList.remove('active'));qsa('.panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');qs(`#${tab.dataset.tab}Panel`).classList.add('active')}));
 fileInput.addEventListener('change',()=>setFiles([...fileInput.files]));
 ['dragenter','dragover'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('dragover')}));
 ['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('dragover')}));
 dropZone.addEventListener('drop',e=>setFiles([...e.dataTransfer.files]));
 function setFiles(files){state.files=files.filter(f=>/\.(txt|yml|yaml|log)$/i.test(f.name));scanFilesBtn.disabled=!state.files.length;dropZone.querySelector('strong').textContent=state.files.length?`${state.files.length} file(s) selected`:'Drop HOI4 text files here'}
+
+logFileInput.addEventListener('change',()=>loadLogFile(logFileInput.files[0]));
+['dragenter','dragover'].forEach(ev=>logDropZone.addEventListener(ev,e=>{e.preventDefault();logDropZone.classList.add('dragover')}));
+['dragleave','drop'].forEach(ev=>logDropZone.addEventListener(ev,e=>{e.preventDefault();logDropZone.classList.remove('dragover')}));
+logDropZone.addEventListener('drop',e=>{const file=[...e.dataTransfer.files].find(f=>/\.(log|txt)$/i.test(f.name));if(file)loadLogFile(file);else logFileStatus.textContent='Please choose a .log or .txt file.'});
+async function loadLogFile(file){if(!file)return;if(!/\.(log|txt)$/i.test(file.name)){logFileStatus.textContent='Please choose a .log or .txt file.';return}state.logFile=file;logFileStatus.textContent=`Loaded ${file.name} (${formatBytes(file.size)})`;logDropZone.querySelector('strong').textContent=file.name;logInput.value=await file.text();renderIssues(analyzeLog(logInput.value,file.name));}
+function formatBytes(bytes){if(bytes<1024)return `${bytes} B`;if(bytes<1024*1024)return `${(bytes/1024).toFixed(1)} KB`;return `${(bytes/(1024*1024)).toFixed(1)} MB`}
+
 scanFilesBtn.addEventListener('click',scanFiles);
-qs('#scanLogBtn').addEventListener('click',()=>renderIssues(analyzeLog(qs('#logInput').value,'error.log')));
+qs('#scanLogBtn').addEventListener('click',()=>renderIssues(analyzeLog(logInput.value,state.logFile?.name||'error.log')));
 qs('#transformYearsBtn').addEventListener('click',transformYears);
 qs('#copyYearsBtn').addEventListener('click',async()=>{await navigator.clipboard.writeText(qs('#yearOutput').value);qs('#copyYearsBtn').textContent='Copied!';setTimeout(()=>qs('#copyYearsBtn').textContent='Copy transformed text',1200)});
 async function scanFiles(){const issues=[];for(const file of state.files){const text=await file.text();if(/\.ya?ml$/i.test(file.name))issues.push(...analyzeLocalization(text,file.name));if(/\.log$/i.test(file.name)||file.name==='error.log')issues.push(...analyzeLog(text,file.name));if(/\.txt$/i.test(file.name))issues.push(...analyzeScript(text,file.name));}renderIssues(issues)}

@@ -39,7 +39,14 @@
       </div>
 
       <div id="logPanel" class="panel">
-        <label for="logInput">Paste your HOI4 <code>error.log</code></label>
+        <label id="logDropZone" class="drop-zone compact-drop-zone">
+          <input id="logFileInput" type="file" accept=".log,.txt,text/plain">
+          <strong>Drop error.log here</strong>
+          <span>or click to choose the file from your computer</span>
+        </label>
+        <div id="logFileStatus" class="file-status" aria-live="polite">No log file selected</div>
+        <div class="or-divider"><span>or paste it manually</span></div>
+        <label for="logInput">HOI4 <code>error.log</code> contents</label>
         <textarea id="logInput" placeholder="[21:04:27][no_game_date][localize.cpp:658]: l_korean: Duplicate localization found, key: militarism_desc..."></textarea>
         <button id="scanLogBtn" class="primary-btn wide">Analyze error.log</button>
       </div>
