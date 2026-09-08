@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Modder demand survey
+    url: https://github.com/Reridy/paradox-doctor/issues/5
+    about: Share a workflow or feature request based on a real modding case.
