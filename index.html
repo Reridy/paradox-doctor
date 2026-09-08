@@ -35,7 +35,7 @@
     </a>
     <div class="header-right">
       <label class="game-switch" for="gameSelect"><span>Game</span><select id="gameSelect"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label>
-      <nav aria-label="Primary navigation"><a href="#workspace">Diagnose</a><a href="guides.html">Guides</a><a href="privacy.html">Privacy</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav>
+      <nav aria-label="Primary navigation"><a href="#workspace">Diagnose</a><a href="regression.html">Compare</a><a href="guides.html">Guides</a><a href="privacy.html">Privacy</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav>
     </div>
   </header>
 
@@ -120,6 +120,8 @@
       <div class="explain-grid"><article><span class="explain-number">01</span><h3>Parse the project</h3><p>Inspect text-based mod files, localization, IDs, references and game-specific structures.</p></article><article><span class="explain-number">02</span><h3>Reduce log noise</h3><p>Collapse repeated engine messages and preserve the most useful source location we can extract.</p></article><article><span class="explain-number">03</span><h3>Prioritize action</h3><p>High-confidence structural problems appear before low-confidence heuristics and informational notes.</p></article></div>
     </section>
 
+    <section class="feedback-strip regression-callout"><div><strong>It worked yesterday. What changed?</strong><span>Compare a last-known-good mod folder with the broken version and rank the changed files most likely to matter.</span></div><a class="secondary-btn" href="regression.html">Compare project versions</a></section>
+
     <section class="guides-section" id="guides">
       <div class="section-heading"><div><p class="eyebrow">GUIDES</p><h2 id="guideHeading">Common HOI4 problems</h2></div><a class="quiet-link" href="guides.html">View all guides →</a></div>
       <div id="guideGrid" class="guide-grid"></div>
@@ -130,7 +132,7 @@
 
   <dialog id="logDialog" class="dialog"><div class="dialog-head"><div><p class="eyebrow">ERROR.LOG</p><h2>Typical location</h2></div><button id="closeLogDialog" class="icon-btn" type="button" aria-label="Close">×</button></div><p id="logPathText" class="path-box"></p><p class="subtle">Reproduce the problem once, then use the fresh log before another launch changes it.</p></dialog>
 
-  <footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav aria-label="Footer"><a href="guides.html">Guides</a><a href="privacy.html">Privacy</a><a href="tools.html">Tools</a><a href="pricing.html">Roadmap</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav></footer>
+  <footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav aria-label="Footer"><a href="regression.html">Regression</a><a href="guides.html">Guides</a><a href="privacy.html">Privacy</a><a href="tools.html">Tools</a><a href="pricing.html">Roadmap</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav></footer>
   <script src="app-core.js"></script>
   <script src="app-game-checks.js"></script>
   <script src="app-log-runner.js"></script>
