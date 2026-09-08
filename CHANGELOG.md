@@ -8,4 +8,5 @@
 - Project Regression Doctor for last-known-good vs broken project comparison.
 - Mod Compatibility Doctor for path, localization, ID and `replace_path` conflicts.
 - Dedicated error guides, privacy/about/feedback pages and structured GitHub issue forms.
+- Google Analytics 4 page and product-event measurement for Diagnose, Regression, Compatibility, reports, guides, feedback and GitHub exits.
 - Automated syntax, static-site and rule-regression quality checks.
