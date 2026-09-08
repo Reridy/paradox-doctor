@@ -6,8 +6,8 @@ const MAX_FILES = 3000;
 const MAX_FILE_BYTES = 2.5 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 70 * 1024 * 1024;
 const GAME_KEY = 'paradoxDoctorGameV4';
-const supported = f => /\.(txt|yml|yaml|mod|gui|asset|csv|json)$/i.test(f.name);
-const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const supported = f => /\.(txt|yml|yaml|mod|gui|gfx|asset|csv|json)$/i.test(f.name);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state = {game:'hoi4',goodFiles:[],brokenFiles:[],good:new Map(),broken:new Map(),logText:'',changes:[],filter:'all',search:''};
 
 function projectPath(file){const p=(file.webkitRelativePath||file.name).replaceAll('\\','/');const parts=p.split('/');return parts.length>1?parts.slice(1).join('/'):p;}
@@ -23,8 +23,8 @@ function suspicionLabel(score){return score>=55?'high':score>=28?'medium':'low';
 async function readFolder(files,target,statusEl){const usable=files.filter(supported).slice(0,MAX_FILES),total=usable.reduce((n,f)=>n+f.size,0);target.clear();if(total>MAX_TOTAL_BYTES)throw new Error(`Selection is ${formatBytes(total)}; reduce supported text files below ${formatBytes(MAX_TOTAL_BYTES)}.`);let n=0;for(const f of usable){if(f.size<=MAX_FILE_BYTES){try{target.set(projectPath(f),await f.text());}catch{}}n++;if(n%80===0){statusEl.textContent=`Reading ${n}/${usable.length} files…`;await new Promise(r=>setTimeout(r,0));}}statusEl.textContent=`${target.size} text files · ${formatBytes(total)}`;return usable;}
 function setReady(){const ok=state.goodFiles.length&&state.brokenFiles.length;$('#regRunBtn').disabled=!ok;$('#regReady').textContent=ok?'Both versions are ready.':'Choose both project folders to compare.';$('#regReadyDetail').textContent=ok?(state.logText?'A fresh error.log will be used to rank changed files.':'Add the broken version error.log for stronger ranking.'):'Only supported text files are read.';}
 
-async function loadGood(files){state.goodFiles=[...files];try{await readFolder(state.goodFiles,state.good,$('#goodStatus'));}catch(e){$('#goodStatus').textContent=e.message;state.goodFiles=[];}setReady();}
-async function loadBroken(files){state.brokenFiles=[...files];try{await readFolder(state.brokenFiles,state.broken,$('#brokenStatus'));}catch(e){$('#brokenStatus').textContent=e.message;state.brokenFiles=[];}setReady();}
+async function loadGood(files){try{state.goodFiles=await readFolder([...files],state.good,$('#goodStatus'));if(!state.good.size)state.goodFiles=[];}catch(e){$('#goodStatus').textContent=e.message;state.goodFiles=[];}setReady();}
+async function loadBroken(files){try{state.brokenFiles=await readFolder([...files],state.broken,$('#brokenStatus'));if(!state.broken.size)state.brokenFiles=[];}catch(e){$('#brokenStatus').textContent=e.message;state.brokenFiles=[];}setReady();}
 async function loadLog(file){if(!file)return;state.logText=await file.text();$('#regLogStatus').textContent=`${file.name} · ${formatBytes(file.size)}`;setReady();}
 
 function buildChanges(){const paths=new Set([...state.good.keys(),...state.broken.keys()]),changes=[];for(const path of paths){const before=state.good.get(path),after=state.broken.get(path);let type;if(before===undefined)type='added';else if(after===undefined)type='removed';else if(before!==after)type='modified';else continue;let score=type==='modified'?14:type==='removed'?18:10;const reasons=[];const risk=pathRisk(path,state.game);score+=risk.score;reasons.push(risk.label);const ls=logSignals(path,state.logText);score+=ls.score;reasons.push(...ls.reasons);let range=null,removedIds=[];if(type==='modified'){range=changedRange(before,after);const bd=braceDelta(before),ad=braceDelta(after);if(ad!==0&&bd===0){score+=32;reasons.push(`brace balance changed from 0 to ${ad}`);}else if(ad!==bd){score+=12;reasons.push(`brace balance changed ${bd} → ${ad}`);}const oldIds=idSet(before,state.game),newIds=idSet(after,state.game);removedIds=[...oldIds].filter(x=>!newIds.has(x)).slice(0,8);if(removedIds.length){score+=Math.min(24,removedIds.length*6);reasons.push(`${removedIds.length} known IDs removed`);}const changedLines=Math.max(range.oldEnd-range.oldStart+1,range.newEnd-range.newStart+1);if(changedLines>80){score+=8;reasons.push('large edit');}}
