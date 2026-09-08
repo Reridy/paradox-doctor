@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HOI4 localization shows raw keys like FOCUS_NAME instead of text? Check localization path, language header, key syntax, encoding and duplicate definitions.">
+  <meta property="og:title" content="HOI4 Localization Shows Raw Keys — Paradox Doctor">
+  <meta property="og:description" content="Fix Hearts of Iron IV localization files that load identifiers instead of readable text.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-localization-raw-key.html">
+  <title>HOI4 Localization Shows Raw Keys — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 LOCALIZATION GUIDE</p>
+  <h1>HOI4 localization shows raw keys</h1>
+  <p>If the game displays an identifier such as <code>MY_FOCUS_NAME</code> instead of readable text, the scripted object may exist while its localization entry is missing, malformed, overridden or not loaded.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Confirm the localization file is under the expected localization folder, has the correct language header, uses valid <code>key:0 "Text"</code> syntax, and is saved with the encoding your setup expects. Then search for duplicate definitions of the same key.</p></div>
+
+  <div class="page-card"><h2>Check these in order</h2><ol><li><strong>Exact key match:</strong> the script reference and localization key must match character for character.</li><li><strong>Language header:</strong> the first active line should declare a language such as <code>l_english:</code>.</li><li><strong>Entry syntax:</strong> verify the colon, optional version number and quoted text.</li><li><strong>File placement:</strong> make sure the file is in the localization structure the game loads.</li><li><strong>Encoding:</strong> if valid-looking text still fails, verify the file encoding in your editor.</li><li><strong>Duplicates:</strong> another file may define the same key and make the result depend on load order.</li></ol></div>
+
+  <div class="page-card"><h2>Raw key vs missing game object</h2><p>A raw localization key does not automatically mean the focus, event, idea or decision failed to load. Separate the object problem from the text problem: first confirm the object exists, then verify its localization.</p></div>
+
+  <div class="page-card"><h2>What Paradox Doctor can check</h2><ul><li>Localization language-header shape</li><li>Common localization entry syntax</li><li>Duplicate keys inside one file and across selected files</li><li>Raw-byte BOM information</li><li>Selected focus localization/reference heuristics</li></ul><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Scan localization files</a><a class="secondary-btn" href="duplicate-localization.html">Duplicate localization guide</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="hoi4-focus-tree-not-showing.html">Focus tree not showing</a> · <a href="duplicate-localization.html">Duplicate localization</a> · <a href="hoi4-error-log-guide.html">How to read error.log</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

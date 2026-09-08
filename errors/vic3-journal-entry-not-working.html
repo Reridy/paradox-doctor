@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Victoria 3 journal entry not working? Check journal structure, trigger conditions, event references, scope assumptions and dependencies before rewriting the chain.">
+  <meta property="og:title" content="Victoria 3 Journal Entry Not Working — Paradox Doctor">
+  <meta property="og:description" content="Debug Victoria 3 journal entries that never appear, never progress or fail to fire their events.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/vic3-journal-entry-not-working.html">
+  <title>Victoria 3 Journal Entry Not Working — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="vic3">
+<header class="site-header"><a class="brand" href="../?game=vic3"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=vic3#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">VICTORIA 3 JOURNAL GUIDE</p>
+  <h1>Victoria 3 journal entry not working</h1>
+  <p>If a journal entry never appears, never completes, or fails to launch the event you expected, separate the problem into four layers: object structure, activation conditions, scope, and referenced events.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>First prove the journal object loads. Then verify its activation and completion conditions in the scope they actually run in. Finally confirm every referenced event ID exists in the active project or dependency set.</p></div>
+
+  <div class="page-card"><h2>When the journal entry never appears</h2><ol><li>Check the journal-entry key and surrounding braces.</li><li>Confirm the file is in the expected journal-entry content path.</li><li>Inspect activation/visibility conditions for impossible or wrong-scope checks.</li><li>Look for parser errors earlier in the same file.</li><li>Check whether another dependency or override changes the same content path.</li></ol></div>
+
+  <div class="page-card"><h2>When it appears but never progresses</h2><ul><li>Trace each progress/completion condition from the current scope.</li><li>Verify saved scopes and event targets are set before use.</li><li>Check timeouts and scripted values rather than assuming the UI state proves the script is advancing.</li><li>Compare the failing block with a known working structure for your current game version.</li></ul></div>
+
+  <div class="page-card"><h2>When the linked event does not fire</h2><ol><li>Confirm the referenced event ID exactly matches a loaded event.</li><li>Check for duplicate event IDs.</li><li>Verify the event is valid for the scope from which the journal calls it.</li><li>If the event comes from vanilla or another dependency, include that context before deciding the reference is missing.</li></ol></div>
+
+  <div class="page-card"><h2>What Paradox Doctor can check</h2><ul><li>Duplicate selected journal-entry keys</li><li>Duplicate selected event IDs</li><li>Journal-to-event reference heuristics</li><li>Optional lookup in a locally selected vanilla/dependency reference folder</li><li>Wrong-scope and unset-target log grouping</li><li>Suspicious <code>timeout = 0</code> usage as a heuristic, not a definite error</li></ul><div class="guide-cta"><a class="primary-btn" href="../?game=vic3#workspace">Scan journal + event files</a><a class="secondary-btn" href="vic3-journal-events.html">Journal/event reference guide</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="vic3-thousands-of-errors.html">Thousands of errors</a> · <a href="vic3-scope.html">Wrong or unset scope</a> · <a href="vic3-localization.html">Localization not loading</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

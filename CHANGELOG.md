@@ -9,4 +9,5 @@
 - Mod Compatibility Doctor for path, localization, ID and `replace_path` conflicts.
 - Dedicated error guides, privacy/about/feedback pages and structured GitHub issue forms.
 - Google Analytics 4 page and product-event measurement for Diagnose, Regression, Compatibility, reports, guides, feedback and GitHub exits.
+- First search-growth content wave: six high-intent HOI4 troubleshooting pages and two Victoria 3 root-cause/journal pages, with internal links and sitemap coverage.
 - Automated syntax, static-site and rule-regression quality checks.

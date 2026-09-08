@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Victoria 3 mod suddenly has thousands of errors? Find the earliest parser, scope or reference failure instead of fixing the cascade line by line.">
+  <meta property="og:title" content="Victoria 3 Mod Has Thousands of Errors — Paradox Doctor">
+  <meta property="og:description" content="A root-cause workflow for huge Victoria 3 error cascades caused by one early structural or scope problem.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/vic3-thousands-of-errors.html">
+  <title>Victoria 3 Mod Has Thousands of Errors — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="vic3">
+<header class="site-header"><a class="brand" href="../?game=vic3"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=vic3#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">VICTORIA 3 ERROR GUIDE</p>
+  <h1>Victoria 3 mod has thousands of errors</h1>
+  <p>A huge Victoria 3 <code>error.log</code> usually does not mean thousands of independent mistakes. One malformed block, invalid scope transition or broken reference can make the parser or script engine misinterpret everything that follows.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Do not start at error number 5,000. Reproduce the problem once, find the earliest distinct error tied to your project, and fix structural/parser failures before later scope and missing-reference messages.</p></div>
+
+  <div class="page-card"><h2>Why error cascades happen</h2><ul><li>A missing or extra brace changes the structure of the rest of a file.</li><li>A malformed object definition can move later keys into the wrong context.</li><li>An invalid scope can make many otherwise-valid commands fail afterward.</li><li>A missing scripted object or event target can be referenced repeatedly by periodic game logic.</li><li>The same engine message can be emitted hundreds or thousands of times.</li></ul></div>
+
+  <div class="page-card"><h2>Root-cause order</h2><ol><li>Capture a fresh log from one clean reproduction.</li><li>Group identical or near-identical messages instead of treating every line separately.</li><li>Prioritize parser/brace errors and messages that name a file you changed.</li><li>Then inspect wrong-scope and unset-target errors.</li><li>Only after structure and scope are sane should you chase individual missing references.</li><li>Relaunch once after each meaningful fix so the log reflects the current project.</li></ol></div>
+
+  <div class="page-card"><h2>Signs you found a cascade</h2><ul><li>Hundreds of errors begin after one file and line.</li><li>Many messages complain about unrelated keys in the same region of a file.</li><li>Fixing one brace or scope transition removes a large part of the log.</li><li>The same error text repeats with only minor object-ID changes.</li></ul></div>
+
+  <div class="page-card"><h2>How Paradox Doctor helps</h2><p>Paradox Doctor groups repeated log patterns, extracts source locations, checks brace balance, and adds selected Victoria 3 project context for localization, journal/event, scope and state-region problems. It ranks likely root causes ahead of repeated lower-value noise.</p><div class="guide-cta"><a class="primary-btn" href="../?game=vic3#workspace">Analyze Victoria 3 project + log</a><a class="secondary-btn" href="vic3-scope.html">Scope failure guide</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="vic3-journal-entry-not-working.html">Journal entry not working</a> · <a href="vic3-localization.html">Localization not loading</a> · <a href="vic3-scope.html">Wrong or unset scope</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

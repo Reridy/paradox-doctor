@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HOI4 mod crashes after adding a state? Check duplicate provinces, strategic regions, state structure, buildings data and map references in a reliable order.">
+  <meta property="og:title" content="HOI4 Mod Crashes After Adding a State — Paradox Doctor">
+  <meta property="og:description" content="A practical checklist for Hearts of Iron IV crashes caused by a newly added or split state.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-mod-crash-after-adding-state.html">
+  <title>HOI4 Mod Crashes After Adding a State — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 CRASH GUIDE</p>
+  <h1>HOI4 mod crashes after adding a state</h1>
+  <p>If Hearts of Iron IV reaches the country-selection screen but crashes after you start the campaign—and removing the new state makes the crash disappear—treat the state change as a cross-file map problem first.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Check province membership before chasing unrelated warnings. A new or split state can break because the same province is still assigned to the old state, a strategic-region definition no longer matches the map, the state block is malformed, or required state/map data was not carried over correctly.</p></div>
+
+  <div class="page-card"><h2>Typical symptoms</h2><ul><li>The game loads to the menu or country-selection map.</li><li>Starting a country causes a CTD during campaign loading.</li><li>Removing the new state files restores normal loading.</li><li><code>error.log</code> contains many warnings that do not obviously explain the crash.</li><li>The map may appear correct in Nudge or debug mode even though another file still references the old province layout.</li></ul></div>
+
+  <div class="page-card"><h2>Check these causes first</h2><ol><li><strong>Province overlap:</strong> make sure no province is assigned to both the old state and the new state.</li><li><strong>Strategic-region membership:</strong> confirm the affected provinces are not duplicated across selected strategic-region files.</li><li><strong>State structure:</strong> verify braces, the state ID, province list, category and history block.</li><li><strong>State data carried over during a split:</strong> review state-level values and map-related data you expected to preserve, including buildings data when your setup requires it.</li><li><strong>Stale generated files:</strong> if you used Nudge, confirm generated map/history files were moved into the mod deliberately and that stale files are not being loaded from the user directory.</li></ol></div>
+
+  <div class="page-card"><h2>Fast isolation workflow</h2><ol><li>Reproduce the crash once and keep a fresh <code>error.log</code>.</li><li>Temporarily test only the target mod and required dependencies.</li><li>Compare the old and new state province lists side by side.</li><li>Check the same provinces in strategic regions.</li><li>Fix the first structural or membership problem you can prove, relaunch once, and generate a new log.</li></ol><p>Do not try to fix every warning in the log at once. Many engine messages are unrelated or are consequences of an earlier map failure.</p></div>
+
+  <div class="page-card"><h2>What Paradox Doctor can check</h2><ul><li>Duplicate selected state IDs</li><li>Provinces assigned to multiple selected states</li><li>Duplicate selected strategic-region province membership</li><li>Brace imbalance and common state/map log patterns</li><li>Regression comparison between a working project and the broken version</li></ul><p>It cannot prove the entire HOI4 map is valid from a partial folder. A clean scan means only that the supplied files did not trigger a supported rule.</p><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Scan project + error.log</a><a class="secondary-btn" href="hoi4-map-state.html">State & province reference guide</a></div></div>
+
+  <div class="page-card"><h2>Related problems</h2><p><a href="hoi4-crash-same-date.html">Crash on the same date every time</a> · <a href="hoi4-error-log-guide.html">How to read HOI4 error.log</a> · <a href="hoi4-mod-broken-after-update.html">Mod broke after a game update</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

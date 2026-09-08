@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HOI4 custom focus tree not showing? Check focus_tree structure, country selection rules, IDs, prerequisites, file loading and localization in a reliable order.">
+  <meta property="og:title" content="HOI4 Focus Tree Not Showing — Paradox Doctor">
+  <meta property="og:description" content="Debug a Hearts of Iron IV country that still gets the generic tree or loads no intended focus tree.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-focus-tree-not-showing.html">
+  <title>HOI4 Focus Tree Not Showing — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 FOCUS GUIDE</p>
+  <h1>HOI4 focus tree not showing</h1>
+  <p>If your country still receives the generic focus tree—or your intended tree never becomes active—the problem is often in tree selection, structure or loading rather than the individual focuses themselves.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Confirm the file is being loaded, the top-level <code>focus_tree</code> block is valid, the tree has a unique ID, and the country-selection logic can actually select the intended country. Then check duplicate focus IDs and broken prerequisites.</p></div>
+
+  <div class="page-card"><h2>Check the tree selector first</h2><ul><li>The <code>focus_tree</code> block must parse correctly.</li><li>The tree ID should be unique and stable.</li><li>Country-selection rules must match the target country or original tag as intended.</li><li>If several trees can match, their selection logic can compete.</li><li>A file in the wrong path or a malformed file may never load as expected.</li></ul></div>
+
+  <div class="page-card"><h2>Then check focus-level problems</h2><ol><li>Look for duplicate focus IDs across selected files.</li><li>Verify prerequisite references point to an existing focus in the active content set.</li><li>Inspect brace balance around the first focus definitions.</li><li>Check whether a parser error earlier in the file prevents the rest of the tree from loading.</li><li>Use localization as a separate check: raw or missing text does not necessarily mean the focus object itself failed to load.</li></ol></div>
+
+  <div class="page-card"><h2>Generic tree vs broken custom tree</h2><p>If the game cleanly falls back to the generic tree, selection logic is a strong suspect. If the UI is partially populated or the log reports focus parsing/reference errors, inspect the custom tree structure and IDs first.</p></div>
+
+  <div class="page-card"><h2>What Paradox Doctor can check</h2><ul><li>Duplicate selected focus IDs</li><li>Supported prerequisite-reference heuristics</li><li>Brace imbalance and parser-related log messages</li><li>Focus localization/reference heuristics</li><li>Regression comparison when the tree worked in an earlier project version</li></ul><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Scan focus files</a><a class="secondary-btn" href="../regression.html">Compare working vs broken</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="unexpected-token.html">Unexpected token</a> · <a href="hoi4-localization-raw-key.html">Localization shows raw keys</a> · <a href="hoi4-error-log-guide.html">How to read error.log</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

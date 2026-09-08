@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Learn how to read HOI4 error.log without chasing hundreds of unrelated warnings. Find the earliest useful root cause, source path and repeated error pattern.">
+  <meta property="og:title" content="HOI4 error.log: How to Find the Real Error — Paradox Doctor">
+  <meta property="og:description" content="A practical workflow for turning a noisy Hearts of Iron IV error.log into a short suspect list.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-error-log-guide.html">
+  <title>HOI4 error.log: How to Find the Real Error — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 LOG GUIDE</p>
+  <h1>HOI4 error.log: how to find the real error</h1>
+  <p>A large <code>error.log</code> is not a to-do list. Hearts of Iron IV can report harmless warnings, dependency noise and long cascades caused by one earlier structural mistake. The goal is to identify the first useful cause, not to fix lines from top to bottom blindly.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Reproduce the bug once, use the fresh log, group repeated messages, and prioritize errors that name a file or line you changed. Parser errors near the beginning of a cascade usually deserve attention before later unknown-key or wrong-scope messages.</p></div>
+
+  <div class="page-card"><h2>Where to start</h2><ol><li>Launch with the mod setup that reproduces the problem.</li><li>Trigger the problem once and close the game.</li><li>Open the newest <code>Documents/Paradox Interactive/Hearts of Iron IV/logs/error.log</code>.</li><li>Search for paths inside your mod, IDs you edited, or the subsystem that broke.</li><li>When many errors repeat, investigate the earliest distinct message rather than every copy.</li></ol></div>
+
+  <div class="page-card"><h2>High-value signals</h2><ul><li><strong>File + line location:</strong> especially useful when it points into a file you recently edited.</li><li><strong>Unexpected token / parser errors:</strong> one malformed block can create many later messages.</li><li><strong>Duplicate IDs or localization keys:</strong> deterministic collisions are easier to verify than vague warnings.</li><li><strong>Map/state references:</strong> important when the failure began after province or state edits.</li><li><strong>Repeated identical messages:</strong> count them once and fix the common cause.</li></ul></div>
+
+  <div class="page-card"><h2>Common traps</h2><ul><li>The final line in the log is not automatically the crash cause.</li><li>A warning can be real without being responsible for the symptom you are debugging.</li><li>Vanilla or dependency references may look missing if you only inspect your own mod folder.</li><li>Old log content becomes misleading if you launch several times without reproducing the same issue cleanly.</li></ul></div>
+
+  <div class="page-card"><h2>Use the log together with the project</h2><p>Logs are strongest when combined with the actual files. Paradox Doctor can collapse repeated engine messages, extract source locations, compare them with selected project files and place deterministic structural findings above low-confidence heuristics.</p><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Analyze project + error.log</a><a class="secondary-btn" href="../regression.html">Compare project versions</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="unexpected-token.html">Unexpected token</a> · <a href="hoi4-mod-crash-after-adding-state.html">Crash after adding a state</a> · <a href="unknown-effect.html">Unknown effect / trigger / scope</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>
