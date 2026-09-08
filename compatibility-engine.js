@@ -14,6 +14,7 @@
   }
   function supportedFile(file){return TEXT_RE.test(file?.name||'');}
   function lineAt(text,index){return String(text).slice(0,Math.max(0,index)).split(/\r?\n/).length;}
+  function isDescriptorPath(path){return /(?:^|\/)(?:descriptor\.mod|[^/]+\.mod)$/i.test(normalizePath(path));}
   function locKeys(text,path){
     const out=[];
     for(const m of String(text).matchAll(/^\s*([^\s:#]+)\s*:/gm)){
@@ -36,7 +37,7 @@
     return out;
   }
   function replacePaths(text,path){
-    if(!/(?:^|\/)(?:descriptor\.mod|[^/]+\.mod)$/i.test(path)) return [];
+    if(!isDescriptorPath(path)) return [];
     const out=[];
     for(const m of String(text).matchAll(/\breplace_path\s*=\s*"([^"]+)"/gi)) out.push(normalizePath(m[1]));
     return out;
@@ -69,7 +70,7 @@
   function compare(entriesA,entriesB,game='hoi4',loadOrder='unknown'){
     const a=indexEntries(entriesA,game),b=indexEntries(entriesB,game),out=[];
     for(const [path,ea] of a.paths){
-      if(!b.paths.has(path)) continue;
+      if(isDescriptorPath(path)||!b.paths.has(path)) continue;
       const eb=b.paths.get(path); const same=ea.text===eb.text; const subsystem=pathRisk(path,game);
       if(same) out.push(make('path','info',`Both mods contain the same file: ${path}`,'The file contents are identical in the selected versions. It is redundant but not necessarily harmful.',{pathA:path,pathB:path,category:'File overrides',action:'Keep only one copy when practical, especially if the file was copied from a dependency as a template.'}));
       else {
@@ -81,13 +82,13 @@
     for(const [k,defsA] of a.ids){if(!b.ids.has(k))continue;const defsB=b.ids.get(k),[type,id]=k.split('|');out.push(make('id','error',`Both mods define ${type} ID: ${id}`,`The same ${type} identifier is defined by both selected mods. This can cause replacement, duplicate-object errors, or inconsistent references depending on the engine object.`,{confidence:'high',pathA:defsA[0].path,pathB:defsB[0].path,id,category:'Duplicate IDs',action:'Rename one object and update its references, or intentionally consolidate the override into one authoritative definition.'}));}
     for(const ra of a.replace){
       for(const rb of b.replace){if(underReplace(ra.path,rb.path)||underReplace(rb.path,ra.path))out.push(make('replace','error',`replace_path overlap: ${ra.path} ↔ ${rb.path}`,'Both mods replace overlapping content trees. One mod can hide large parts of the other regardless of individual file IDs.',{confidence:'high',pathA:ra.source,pathB:rb.source,category:'replace_path',action:'Avoid overlapping replace_path scopes when the mods must work together, or create a dedicated compatibility patch.'}));}
-      for(const path of b.paths.keys())if(underReplace(path,ra.path))out.push(make('replace','warning',`Mod A replace_path can hide Mod B file: ${path}`,`Mod A declares replace_path = "${ra.path}".`,{confidence:'high',pathA:ra.source,pathB:path,category:'replace_path',action:'Check load order and whether Mod B content inside this replaced path needs to be merged into a compatibility patch.'}));
+      for(const path of b.paths.keys())if(!isDescriptorPath(path)&&underReplace(path,ra.path))out.push(make('replace','warning',`Mod A replace_path can hide Mod B file: ${path}`,`Mod A declares replace_path = "${ra.path}".`,{confidence:'high',pathA:ra.source,pathB:path,category:'replace_path',action:'Check load order and whether Mod B content inside this replaced path needs to be merged into a compatibility patch.'}));
     }
-    for(const rb of b.replace)for(const path of a.paths.keys())if(underReplace(path,rb.path))out.push(make('replace','warning',`Mod B replace_path can hide Mod A file: ${path}`,`Mod B declares replace_path = "${rb.path}".`,{confidence:'high',pathA:path,pathB:rb.source,category:'replace_path',action:'Check load order and whether Mod A content inside this replaced path needs to be merged into a compatibility patch.'}));
+    for(const rb of b.replace)for(const path of a.paths.keys())if(!isDescriptorPath(path)&&underReplace(path,rb.path))out.push(make('replace','warning',`Mod B replace_path can hide Mod A file: ${path}`,`Mod B declares replace_path = "${rb.path}".`,{confidence:'high',pathA:path,pathB:rb.source,category:'replace_path',action:'Check load order and whether Mod A content inside this replaced path needs to be merged into a compatibility patch.'}));
     const uniq=new Map();
     for(const x of out){const k=[x.kind,x.title,x.pathA,x.pathB].join('|');if(!uniq.has(k))uniq.set(k,x);}
     const rank={error:0,warning:1,info:2};
     return [...uniq.values()].sort((x,y)=>rank[x.severity]-rank[y.severity]||x.title.localeCompare(y.title));
   }
-  return {normalizePath,relativeProjectPath,supportedFile,locKeys,idsFor,replacePaths,pathRisk,indexEntries,compare};
+  return {normalizePath,relativeProjectPath,supportedFile,isDescriptorPath,locKeys,idsFor,replacePaths,pathRisk,indexEntries,compare};
 });
