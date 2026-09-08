@@ -21,6 +21,18 @@ Live site: `https://reridy.github.io/paradox-doctor/`
 5. Start with likely root causes, then review lower-confidence warnings.
 6. Save a good result as a local regression baseline or export JSON/Markdown.
 
+## Project Regression Doctor
+
+`regression.html` compares a last-known-good project folder with the current broken version.
+
+- Added, removed, and modified text files are detected by relative project path.
+- Changed files are ranked using game-sensitive folder risk, brace-balance changes, removed known identifiers, edit size, and optional `error.log` correlation.
+- The first changed area can be previewed side-by-side without uploading source files.
+- Regression reports can be exported as Markdown or JSON.
+- A structured GitHub feedback action lets users report a wrong ranking so real cases can improve future prioritization.
+
+The ranking is deliberately presented as a **suspect list, not a verdict**.
+
 ## Key checks
 
 ### Shared
@@ -46,25 +58,21 @@ Live site: `https://reridy.github.io/paradox-doctor/`
 - Duplicate state-region keys and repeated selected province membership.
 - Scope/event-target and map/state log triage.
 
-## Regression workflow
+## Finding baseline workflow
 
 Each game can store one local baseline made of finding fingerprints. A later scan can show only findings that are new relative to that baseline. Ignored-finding fingerprints are also stored locally and separately by game.
 
 ## Repository quality
 
-The site has no build step. GitHub Actions runs:
-
-```bash
-node --check app-core.js && node --check app-game-checks.js && node --check app-log-runner.js && node --check app-ui.js
-node scripts/check-site.mjs
-```
+The site has no build step. GitHub Actions runs JavaScript syntax checks for the diagnostic app, Regression Doctor and tools, plus `node scripts/check-site.mjs`.
 
 The static checker verifies internal file targets and duplicate HTML IDs.
 
 ## Architecture
 
 - `index.html` — main diagnostic workspace
-- `app-core.js` / `app-game-checks.js` / `app-log-runner.js` / `app-ui.js` — one cohesive scanner split by responsibility: state/input, analyzers, and result/workflow UI
+- `app-core.js` / `app-game-checks.js` / `app-log-runner.js` / `app-ui.js` — main scanner split by responsibility
+- `regression.html` / `regression.js` / `regression.css` — two-project regression comparison
 - `style.css` — shared responsive styles
 - `guides.html` + `errors/` — user-facing troubleshooting content
 - `games/` — game-specific landing pages
@@ -74,7 +82,7 @@ The static checker verifies internal file targets and duplicate HTML IDs.
 
 ## Limitations
 
-Paradox Doctor is a heuristic diagnostic assistant, not a full engine parser and not a replacement for Paradox debug mode, CWTools, Tiger or direct game validation. Partial folder selections can only be checked against the context actually supplied.
+Paradox Doctor is a heuristic diagnostic assistant, not a full engine parser and not a replacement for Paradox debug mode, CWTools, Tiger or direct game validation. Partial folder selections can only be checked against the context actually supplied. Regression ranking is heuristic and should be used to decide what to inspect first, not as proof of causation.
 
 ## Disclaimer
 

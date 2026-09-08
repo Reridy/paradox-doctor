@@ -15,4 +15,6 @@ jobs:
       - run: node --check app-game-checks.js
       - run: node --check app-log-runner.js
       - run: node --check app-ui.js
+      - run: node --check regression.js
+      - run: node --check tools.js
       - run: node scripts/check-site.mjs
