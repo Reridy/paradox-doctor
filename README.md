@@ -1,88 +1,93 @@
 # Paradox Doctor
 
-Paradox Doctor is a local-first browser diagnostic workspace for **Hearts of Iron IV** and **Victoria 3** modders.
+Paradox Doctor is a local-first browser diagnostic toolkit for **Hearts of Iron IV** and **Victoria 3** modders.
 
 Live site: `https://reridy.github.io/paradox-doctor/`
 
+## Public v1 workflows
+
+### Diagnose a broken project
+- Scan a full mod folder, selected files, `error.log`, or both.
+- Prioritize likely root causes instead of reproducing raw engine noise.
+- Label deterministic findings separately from heuristics.
+- Save a local baseline, ignore known noise, search/filter findings, and export Markdown/JSON reports.
+- Optionally compare against a local vanilla/dependency reference folder and current game version.
+
+### Project Regression Doctor
+- Compare the latest known-good project with the current broken version.
+- Detect added, removed and modified text files by relative path.
+- Rank changed files using game-sensitive paths, brace changes, removed IDs and optional `error.log` correlation.
+- Export a source-free regression report.
+
+### Mod Compatibility Doctor
+- Compare two complete mod roots locally.
+- Detect exact-path overrides, duplicate localization keys, game-aware duplicate IDs and `replace_path` overlap.
+- Support HOI4 focus/event/state IDs and Victoria 3 journal/event/state-region IDs.
+- Apply an optional load-order assumption and export Markdown/JSON reports.
+
 ## Product principles
 
-- **Root-cause first:** repeated engine noise is grouped and high-confidence structural findings are prioritized.
-- **Game-aware:** HOI4 and Victoria 3 use different checks and guidance.
-- **Honest uncertainty:** deterministic findings and heuristics are labelled differently; a clean scan is not presented as proof that a mod is bug-free.
-- **Local-first:** selected project files, references and logs stay in the browser in the public beta.
-- **Workflow over warning count:** regression baselines, ignored fingerprints, reference context and exportable reports reduce repeat debugging work.
-
-## Current workflow
-
-1. Select HOI4 or Victoria 3.
-2. Add a project folder, `error.log`, or both.
-3. Optionally load a local vanilla/dependency reference and current game version.
-4. Run diagnosis.
-5. Start with likely root causes, then review lower-confidence warnings.
-6. Save a good result as a local regression baseline or export JSON/Markdown.
-
-## Project Regression Doctor
-
-`regression.html` compares a last-known-good project folder with the current broken version.
-
-- Added, removed, and modified text files are detected by relative project path.
-- Changed files are ranked using game-sensitive folder risk, brace-balance changes, removed known identifiers, edit size, and optional `error.log` correlation.
-- The first changed area can be previewed side-by-side without uploading source files.
-- Regression reports can be exported as Markdown or JSON.
-- A structured GitHub feedback action lets users report a wrong ranking so real cases can improve future prioritization.
-
-The ranking is deliberately presented as a **suspect list, not a verdict**.
+- **Root-cause first** — high-signal structural problems come before noisy heuristics.
+- **Game-aware** — HOI4 and Victoria 3 use different rules and explanations.
+- **Honest uncertainty** — a clean scan is not presented as proof that a mod is valid.
+- **Local-first** — selected source files and logs are processed in the browser in v1.
+- **Workflow over warning count** — regression, compatibility, baselines, references and reports aim to reduce debugging time.
 
 ## Key checks
 
 ### Shared
-- Brace balance with strings/comments excluded from brace counting.
-- Localization language-header and entry-shape checks.
-- UTF-8 BOM information read from the raw bytes instead of decoded text.
+- Brace balance while ignoring braces in quoted strings/comments.
+- Localization header/entry-shape checks and raw-byte BOM information.
 - Duplicate localization keys inside one file and across selected files.
-- `supported_version` comparison when a game version is supplied.
-- Repeated `error.log` grouping with source-location extraction when possible.
-- Optional exact-path/localization collision context against a local reference folder.
+- `supported_version` comparison when a current game version is supplied.
+- Repeated `error.log` grouping and source-location extraction when possible.
+- Optional exact-path/localization reference context.
 
 ### Hearts of Iron IV
-- Duplicate focus IDs and event IDs.
-- Missing focus prerequisite references as dependency-aware heuristics.
-- Duplicate state IDs and provinces assigned to multiple selected states.
+- Duplicate focus, event and state IDs.
+- Dependency-aware focus-reference heuristics.
+- Provinces assigned to multiple selected states.
 - Duplicate province membership across selected strategic-region files.
 - Conservative state/category/history/buildings review items.
 
 ### Victoria 3
-- Duplicate journal-entry and event IDs.
-- Journal/event reference heuristics with optional dependency reference lookup.
-- Suspicious `timeout = 0` as a heuristic.
-- Duplicate state-region keys and repeated selected province membership.
-- Scope/event-target and map/state log triage.
+- Duplicate journal-entry, event and state-region IDs.
+- Journal/event reference heuristics.
+- Scope/event-target error-log grouping.
+- Duplicate selected province membership across state regions.
+- Localization-path and map/state heuristics.
 
-## Finding baseline workflow
+## Quality gates
 
-Each game can store one local baseline made of finding fingerprints. A later scan can show only findings that are new relative to that baseline. Ignored-finding fingerprints are also stored locally and separately by game.
+GitHub Actions checks JavaScript syntax, static-site links/duplicate IDs, and a small rule regression suite before merge.
 
-## Repository quality
-
-The site has no build step. GitHub Actions runs JavaScript syntax checks for the diagnostic app, Regression Doctor and tools, plus `node scripts/check-site.mjs`.
-
-The static checker verifies internal file targets and duplicate HTML IDs.
+```bash
+node --check app-core.js
+node --check app-game-checks.js
+node --check app-log-runner.js
+node --check app-ui.js
+node --check regression.js
+node --check compatibility-engine.js
+node --check compatibility.js
+node --check tools.js
+node --test tests/*.test.mjs tests/*.test.cjs
+node scripts/check-site.mjs
+```
 
 ## Architecture
 
-- `index.html` — main diagnostic workspace
-- `app-core.js` / `app-game-checks.js` / `app-log-runner.js` / `app-ui.js` — main scanner split by responsibility
-- `regression.html` / `regression.js` / `regression.css` — two-project regression comparison
-- `style.css` — shared responsive styles
-- `guides.html` + `errors/` — user-facing troubleshooting content
-- `games/` — game-specific landing pages
-- `tools.html` / `tools.js` — non-core utilities such as HOI4 year shifting
+- `index.html` + `app-*.js` — main diagnostic workspace
+- `regression.html` / `regression.js` — project-version comparison
+- `compatibility.html` / `compatibility-engine.js` / `compatibility.js` — two-mod compatibility analysis
+- `guides.html` + `errors/` — troubleshooting library
+- `tools.html` / `tools.js` — focused utilities
+- `about.html` — support matrix and limitations
+- `feedback.html` + GitHub issue forms — structured field feedback
 - `privacy.html` — local-data behavior
-- `pricing.html` — product roadmap; there is no paid plan today
 
 ## Limitations
 
-Paradox Doctor is a heuristic diagnostic assistant, not a full engine parser and not a replacement for Paradox debug mode, CWTools, Tiger or direct game validation. Partial folder selections can only be checked against the context actually supplied. Regression ranking is heuristic and should be used to decide what to inspect first, not as proof of causation.
+Paradox Doctor is a heuristic diagnostic assistant, not a complete Clausewitz/Jomini parser and not a replacement for Paradox debug mode, map validation, CWTools, Tiger, or direct in-game testing. Partial folder selections can only be checked against the context supplied.
 
 ## Disclaimer
 

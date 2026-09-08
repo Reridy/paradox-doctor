@@ -1,0 +1,31 @@
+name: False positive
+description: A finding was reported but the code is valid or intentional.
+title: "[False positive] "
+labels: []
+body:
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options: [Hearts of Iron IV, Victoria 3]
+    validations:
+      required: true
+  - type: input
+    id: finding
+    attributes:
+      label: Finding title
+      placeholder: Exact title shown by Paradox Doctor
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it a false positive?
+      description: Explain how you confirmed the code is valid or intentional.
+    validations:
+      required: true
+  - type: textarea
+    id: minimal
+    attributes:
+      label: Minimal reproduction
+      description: Share only the smallest safe excerpt or path needed. Do not post private source you cannot share.

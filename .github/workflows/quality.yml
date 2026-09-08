@@ -16,5 +16,8 @@ jobs:
       - run: node --check app-log-runner.js
       - run: node --check app-ui.js
       - run: node --check regression.js
+      - run: node --check compatibility-engine.js
+      - run: node --check compatibility.js
       - run: node --check tools.js
+      - run: node --test tests/*.test.mjs tests/*.test.cjs
       - run: node scripts/check-site.mjs

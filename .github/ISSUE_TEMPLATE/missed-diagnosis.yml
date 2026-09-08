@@ -1,0 +1,30 @@
+name: Missed diagnosis
+description: The real root cause was not surfaced by the scanner.
+title: "[Missed diagnosis] "
+labels: []
+body:
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options: [Hearts of Iron IV, Victoria 3]
+    validations:
+      required: true
+  - type: textarea
+    id: symptom
+    attributes:
+      label: What was broken?
+    validations:
+      required: true
+  - type: textarea
+    id: cause
+    attributes:
+      label: What was the real cause?
+      description: Tell us what change actually fixed it.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Minimal safe error.log excerpt or path
+      description: Optional. Remove personal or private information first.

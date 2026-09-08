@@ -1,0 +1,22 @@
+name: Site bug
+description: A button, browser flow, export, or page is broken or confusing.
+title: "[Site bug] "
+labels: []
+body:
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Chrome / Windows, Safari / iPhone, etc.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual result
+    validations:
+      required: true

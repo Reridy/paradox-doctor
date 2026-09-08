@@ -2,8 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://reridy.github.io/paradox-doctor/</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/regression.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/compatibility.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/guides.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/tools.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/about.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/feedback.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/games/hoi4.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/games/victoria3.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/unexpected-token.html</loc></url>
