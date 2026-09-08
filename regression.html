@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare a last-known-good Paradox mod folder with a broken version and rank the changed files most likely to have introduced the regression. Runs locally in your browser.">
+  <meta name="theme-color" content="#0b0f16">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/regression.html">
+  <title>Project Regression Doctor — Paradox Doctor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="regression.css">
+</head>
+<body data-game="hoi4">
+  <a class="skip-link" href="#regressionWorkspace">Skip to comparison</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Paradox Doctor home"><span class="brand-mark" aria-hidden="true">PD</span><span>Paradox Doctor</span><span class="beta">Beta</span></a>
+    <div class="header-right">
+      <label class="game-switch" for="regGame"><span>Game</span><select id="regGame"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label>
+      <nav aria-label="Primary navigation"><a href="./#workspace">Diagnose</a><a href="regression.html" aria-current="page">Compare</a><a href="guides.html">Guides</a><a href="tools.html">Tools</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero regression-hero">
+      <div class="hero-kicker"><span>REGRESSION</span><span>Local project comparison</span></div>
+      <h1>What changed when your mod broke?</h1>
+      <p>Compare the last version that worked with the version that does not. Paradox Doctor ranks changed files using path risk, structural changes, removed IDs, and an optional fresh <code>error.log</code>.</p>
+      <div class="hero-trust"><span>Runs in your browser</span><span>No upload</span><span>No account</span><span>HOI4 + Victoria 3</span></div>
+    </section>
+
+    <section id="regressionWorkspace" class="workspace regression-workspace" aria-labelledby="regressionTitle">
+      <div class="workspace-head"><div><p class="eyebrow">PROJECT REGRESSION DOCTOR</p><h2 id="regressionTitle">Compare two project versions</h2><p class="subtle">Use the entire mod root for both versions so relative paths line up correctly.</p></div><button id="regClearBtn" class="ghost-btn" type="button">Clear comparison</button></div>
+
+      <div class="reg-input-grid">
+        <section class="input-card reg-version-card">
+          <div class="input-card-head"><span class="step">A</span><div><h3>Last known good</h3><p>The newest project folder that definitely launched or behaved correctly.</p></div></div>
+          <label class="reg-folder-picker"><input id="goodFolder" type="file" webkitdirectory directory multiple><span class="picker-icon">✓</span><span><strong>Choose working folder</strong><small id="goodStatus">Nothing selected</small></span></label>
+        </section>
+        <section class="input-card reg-version-card">
+          <div class="input-card-head"><span class="step">B</span><div><h3>Current broken version</h3><p>The version where the crash, missing content, raw key, scope error, or other regression appears.</p></div></div>
+          <label class="reg-folder-picker"><input id="brokenFolder" type="file" webkitdirectory directory multiple><span class="picker-icon">!</span><span><strong>Choose broken folder</strong><small id="brokenStatus">Nothing selected</small></span></label>
+        </section>
+      </div>
+
+      <section class="reg-log-card">
+        <div><strong>Optional current error.log</strong><span>Strongly improves ranking when the engine names a changed file or related subsystem.</span></div>
+        <label class="mini-picker"><input id="regLogFile" type="file" accept=".log,.txt,text/plain"><strong>Choose error.log</strong><span id="regLogStatus">No log selected</span></label>
+      </section>
+
+      <div class="run-bar"><div><strong id="regReady">Choose both project folders to compare.</strong><span id="regReadyDetail">Only supported text files are read.</span></div><button id="regRunBtn" class="primary-btn run-btn" type="button" disabled>Compare versions</button></div>
+      <div id="regProgress" class="progress-wrap hidden" aria-live="polite"><div class="progress-track"><div id="regProgressBar" class="progress-bar"></div></div><div class="progress-meta"><span id="regProgressText">Preparing…</span></div></div>
+    </section>
+
+    <section id="regResults" class="results hidden" aria-labelledby="regResultsTitle">
+      <div class="results-summary">
+        <div class="diagnosis-state"><span class="status-dot warn"></span><div><p class="eyebrow">REGRESSION ANALYSIS</p><h2 id="regResultsTitle">Changed files ranked by suspicion</h2><p id="regResultsSubtitle" class="subtle"></p></div></div>
+        <div class="summary-counts"><div><strong id="changedCount">0</strong><span>modified</span></div><div><strong id="addedCount">0</strong><span>added</span></div><div><strong id="removedCount">0</strong><span>removed</span></div><div><strong id="logMatchedCount">0</strong><span>log matches</span></div></div>
+      </div>
+
+      <section id="topSuspects" class="start-here hidden"><div class="section-label"><span>Start here</span><small>These changes have the strongest combination of engine-log relevance and risky project changes.</small></div><ol id="topSuspectList"></ol></section>
+
+      <div class="results-controls">
+        <div class="filters" role="group" aria-label="Change filters"><button class="filter active" data-change="all" type="button">All</button><button class="filter" data-change="modified" type="button">Modified</button><button class="filter" data-change="added" type="button">Added</button><button class="filter" data-change="removed" type="button">Removed</button></div>
+        <div class="result-tools"><label class="search-box"><span class="visually-hidden">Search changed files</span><input id="regSearch" type="search" placeholder="Search changed files…"></label></div>
+      </div>
+
+      <div id="regList" class="reg-list"></div>
+      <div id="regEmpty" class="empty-state hidden"><strong>No changes match this view.</strong><span>Try another filter or search.</span></div>
+
+      <div class="report-bar"><div><strong>Keep the comparison with the bug report</strong><span>Exports contain paths and change summaries, not source-file contents.</span></div><div class="button-row"><button id="regJsonBtn" class="secondary-btn small-btn" type="button">Export JSON</button><button id="regMdBtn" class="secondary-btn small-btn" type="button">Export Markdown</button><button id="regCopyBtn" class="ghost-btn small-btn" type="button">Copy summary</button><button id="regFeedbackBtn" class="ghost-btn small-btn" type="button">Report a wrong ranking</button></div></div>
+    </section>
+
+    <section class="explain-section">
+      <div class="section-heading"><div><p class="eyebrow">HOW RANKING WORKS</p><h2>A suspect list, not a verdict.</h2></div><p>The tool does not claim the top file caused the bug. It prioritizes files using reproducible signals and shows the reasons for each ranking.</p></div>
+      <div class="explain-grid"><article><span class="explain-number">01</span><h3>Find actual changes</h3><p>Added, removed, and text-modified files are compared by relative project path.</p></article><article><span class="explain-number">02</span><h3>Look for risky changes</h3><p>Structural imbalance, removed IDs, and game-sensitive folders increase suspicion.</p></article><article><span class="explain-number">03</span><h3>Correlate error.log</h3><p>If the fresh log mentions the changed path or its subsystem, that change moves higher.</p></article></div>
+    </section>
+  </main>
+
+  <footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="./#workspace">Diagnose</a><a href="guides.html">Guides</a><a href="privacy.html">Privacy</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav></footer>
+  <script src="regression.js"></script>
+</body>
+</html>
