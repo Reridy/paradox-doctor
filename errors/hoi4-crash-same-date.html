@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HOI4 crashes on the same date every time? Use the date as a clue to isolate scheduled events, focuses, decisions, AI actions and scripted effects.">
+  <meta property="og:title" content="HOI4 Crashes on the Same Date Every Time — Paradox Doctor">
+  <meta property="og:description" content="A systematic way to debug reproducible date-based Hearts of Iron IV mod crashes.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-crash-same-date.html">
+  <title>HOI4 Crashes on the Same Date Every Time — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 CRASH GUIDE</p>
+  <h1>HOI4 crashes on the same date every time</h1>
+  <p>A crash that repeats on the same in-game date is valuable evidence. Something deterministic is often being evaluated or completed around that time, so narrow the search to content that can fire then instead of reviewing the whole mod.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Load a save shortly before the crash, reproduce it once, and examine the freshest log. Then check scheduled events, focus completions, decisions, on-actions, scripted effects, AI-triggered content and state changes that can execute around that date.</p></div>
+
+  <div class="page-card"><h2>Why the date matters</h2><ul><li>A national focus may complete on that day.</li><li>An event or decision timeout may expire.</li><li>A periodic on-action or scripted check may run.</li><li>AI-controlled countries can execute the same broken content even if the player never interacts with it.</li><li>A war, annexation, state transfer or tag-related transition can expose an invalid reference only when the game reaches that state.</li></ul></div>
+
+  <div class="page-card"><h2>Isolation workflow</h2><ol><li>Keep a save one or two days before the reproducible crash.</li><li>Launch, reproduce once, then stop. Do not overwrite the useful fresh log with unrelated later launches.</li><li>Look first for messages timestamped or emitted near the end of <code>error.log</code>.</li><li>Search your project for event IDs, focus IDs, state IDs or file paths named near those messages.</li><li>Temporarily disable one suspected event chain, focus completion or periodic script at a time.</li><li>When the crash date moves or disappears, reduce the suspect block further.</li></ol></div>
+
+  <div class="page-card"><h2>Do not assume the last log line caused the crash</h2><p>The final message can be a symptom, and some fatal failures produce little useful text in <code>error.log</code>. Correlate log evidence with what changed in the project and what the simulation is scheduled to do on that date.</p></div>
+
+  <div class="page-card"><h2>How Paradox Doctor helps</h2><p>Use the normal diagnosis to group repeated log messages and check project structure. If the crash appeared after recent edits, Project Regression Doctor can compare the last working folder with the broken folder and rank changed files by path risk, structural differences and log mentions.</p><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Analyze fresh error.log</a><a class="secondary-btn" href="../regression.html">Compare working vs broken</a></div></div>
+
+  <div class="page-card"><h2>Related problems</h2><p><a href="hoi4-error-log-guide.html">How to find the real error in error.log</a> · <a href="hoi4-mod-broken-after-update.html">Mod broke after a game update</a> · <a href="unexpected-token.html">Unexpected token / parser cascade</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>
