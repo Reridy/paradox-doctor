@@ -11,6 +11,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: node --check analytics.js
       - run: node --check app-core.js
       - run: node --check app-game-checks.js
       - run: node --check app-log-runner.js
