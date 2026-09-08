@@ -17,3 +17,10 @@ test('detects overlapping replace_path',()=>{
   const r=E.compare(a,b,'vic3','unknown');
   assert.ok(r.some(x=>x.kind==='replace'&&x.severity==='error'));
 });
+
+test('does not report descriptor.mod as a normal exact-path collision',()=>{
+  const a=new Map([['descriptor.mod',entry('name = "A"')]]);
+  const b=new Map([['descriptor.mod',entry('name = "B"')]]);
+  const r=E.compare(a,b,'hoi4','unknown');
+  assert.equal(r.some(x=>x.kind==='path'&&x.pathA==='descriptor.mod'),false);
+});
