@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HOI4 mod broke after a game update? Check supported_version, changed script behavior, renamed content, map/state data and dependencies before rewriting the mod.">
+  <meta property="og:title" content="HOI4 Mod Broke After a Game Update — Paradox Doctor">
+  <meta property="og:description" content="A practical migration checklist for Hearts of Iron IV mods that stopped working after an update.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/errors/hoi4-mod-broken-after-update.html">
+  <title>HOI4 Mod Broke After a Game Update — Paradox Doctor</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">Diagnose</a><a href="../guides.html">Guides</a><a href="../privacy.html">Privacy</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 UPDATE GUIDE</p>
+  <h1>HOI4 mod broke after a game update</h1>
+  <p>When a mod worked on an older Hearts of Iron IV version and fails after an update, do not start by rewriting everything. First separate a simple descriptor warning from an actual compatibility break in scripts, data structures, map files or dependencies.</p>
+
+  <div class="page-card"><h2>Quick answer</h2><p>Update the declared supported version, reproduce the failure on the new game version, then compare a last-known-good project with the current one. Prioritize errors tied to files or systems touched by the game update rather than treating every warning as fatal.</p></div>
+
+  <div class="page-card"><h2>Common failure categories</h2><ul><li><strong>Descriptor mismatch:</strong> <code>supported_version</code> is stale. This is easy to fix but may not be the real bug.</li><li><strong>Script behavior changed:</strong> an effect, trigger, scope or object field may no longer behave as before.</li><li><strong>Vanilla IDs or paths changed:</strong> your mod may reference content that moved, changed or was removed.</li><li><strong>Map/state compatibility:</strong> map-related content is sensitive to changes in vanilla state, province or strategic-region data.</li><li><strong>Dependency lag:</strong> a required mod may not yet support the new game version.</li></ul></div>
+
+  <div class="page-card"><h2>Migration workflow</h2><ol><li>Keep a copy of the last project version that worked.</li><li>Test with only your mod and required dependencies enabled.</li><li>Reproduce one specific failure and capture a fresh <code>error.log</code>.</li><li>Check <code>supported_version</code>, then move on if the symptom persists.</li><li>Search the log for your changed file paths and object IDs.</li><li>Compare working and broken project folders to see what changed on your side.</li><li>For references into vanilla/dependencies, load a local reference folder when possible before declaring an ID missing.</li></ol></div>
+
+  <div class="page-card"><h2>Do not confuse warning cleanup with migration</h2><p>Older mods can accumulate warnings that were already present when the mod worked. Fix reproducible blockers first. A warning becomes much more useful when it correlates with the subsystem that actually broke after the update.</p></div>
+
+  <div class="page-card"><h2>How Paradox Doctor helps</h2><ul><li>Checks descriptor version information when you provide the current game version</li><li>Groups repeated log messages and extracts source locations</li><li>Flags duplicate IDs and structural issues in supported systems</li><li>Compares a working project against the broken version</li><li>Can use an optional local vanilla/dependency reference folder for extra context</li></ul><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">Run migration diagnosis</a><a class="secondary-btn" href="../regression.html">Compare project versions</a></div></div>
+
+  <div class="page-card"><h2>Related guides</h2><p><a href="hoi4-error-log-guide.html">How to read error.log</a> · <a href="hoi4-mod-crash-after-adding-state.html">Crash after adding a state</a> · <a href="unknown-effect.html">Unknown effect / trigger / scope</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>
