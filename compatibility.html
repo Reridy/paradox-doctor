@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare two Hearts of Iron IV or Victoria 3 mods for file overrides, duplicate IDs, localization collisions and replace_path conflicts. Runs locally in your browser.">
+  <meta name="theme-color" content="#0b0f16">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/compatibility.html">
+  <title>Mod Compatibility Doctor — Paradox Doctor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="compatibility.css">
+</head>
+<body data-game="hoi4">
+  <a class="skip-link" href="#compatWorkspace">Skip to compatibility check</a>
+  <header class="site-header">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">PD</span><span>Paradox Doctor</span><span class="beta">v1.0</span></a>
+    <div class="header-right"><label class="game-switch" for="compatGame"><span>Game</span><select id="compatGame"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label><nav aria-label="Primary navigation"><a href="./#workspace">Diagnose</a><a href="regression.html">Regression</a><a href="compatibility.html" aria-current="page">Compatibility</a><a href="guides.html">Guides</a></nav></div>
+  </header>
+  <main>
+    <section class="hero compat-hero"><div class="hero-kicker"><span>COMPATIBILITY</span><span>Local two-mod analysis</span></div><h1>Will these two mods step on each other?</h1><p>Compare two mod roots for exact-path overrides, duplicate game IDs, localization collisions and <code>replace_path</code> conflicts. The tool reports conflicts; it does not claim every overlap is a bug.</p><div class="hero-trust"><span>Runs in your browser</span><span>No source upload</span><span>HOI4 + Victoria 3</span><span>Exportable report</span></div></section>
+    <section id="compatWorkspace" class="workspace compat-workspace">
+      <div class="workspace-head"><div><p class="eyebrow">MOD COMPATIBILITY DOCTOR</p><h2>Compare two mod roots</h2><p class="subtle">Choose the complete root folder for each mod. Only supported text-based files are read.</p></div><button id="compatClear" class="ghost-btn" type="button">Clear comparison</button></div>
+      <div class="compat-grid">
+        <section class="input-card"><div class="input-card-head"><span class="step">A</span><div><h3>Mod A</h3><p>First mod in the comparison.</p></div></div><label class="compat-folder"><input id="modA" type="file" webkitdirectory directory multiple><span class="picker-icon">A</span><span><strong>Choose Mod A folder</strong><small id="statusA">Nothing selected</small></span></label></section>
+        <section class="input-card"><div class="input-card-head"><span class="step">B</span><div><h3>Mod B</h3><p>Second mod in the comparison.</p></div></div><label class="compat-folder"><input id="modB" type="file" webkitdirectory directory multiple><span class="picker-icon">B</span><span><strong>Choose Mod B folder</strong><small id="statusB">Nothing selected</small></span></label></section>
+      </div>
+      <div class="compat-options"><label class="compat-option">Load-order assumption<select id="loadOrder"><option value="unknown">Unknown / do not assume a winner</option><option value="a-first">Mod A loads before Mod B</option><option value="b-first">Mod B loads before Mod A</option></select></label><div class="advanced-card"><h3>What is checked</h3><p>Exact file paths, localization keys, game-aware IDs and descriptor <code>replace_path</code>.</p></div></div>
+      <div class="run-bar"><div><strong id="compatReady">Choose both mod root folders.</strong><span id="compatReadyDetail">Use complete mod roots for the most reliable result.</span></div><button id="compatRun" class="primary-btn run-btn" type="button" disabled>Check compatibility</button></div><div id="compatProgress" class="progress-wrap hidden" aria-live="polite"><div class="progress-track"><div id="compatProgressBar" class="progress-bar"></div></div><div class="progress-meta"><span id="compatProgressText">Preparing…</span></div></div>
+    </section>
+    <section id="compatResults" class="results hidden">
+      <div class="results-summary"><div class="diagnosis-state"><span class="status-dot warn"></span><div><p class="eyebrow">COMPATIBILITY REPORT</p><h2 id="compatTitle">Compatibility overlaps</h2><p id="compatSubtitle" class="subtle"></p></div></div><div class="summary-counts"><div><strong id="compatHigh">0</strong><span>high conflicts</span></div><div><strong id="compatReview">0</strong><span>review</span></div><div><strong id="compatInfo">0</strong><span>info</span></div><div><strong id="compatSharedPaths">0</strong><span>shared paths</span></div></div></div>
+      <section id="compatStart" class="start-here hidden"><div class="section-label"><span>Start here</span><small>Review these before trying to solve load-order symptoms elsewhere.</small></div><ol id="compatStartList"></ol></section>
+      <div class="results-controls"><div class="filters"><button class="filter active" data-compat-filter="all" type="button">All</button><button class="filter" data-compat-filter="error" type="button">High conflicts</button><button class="filter" data-compat-filter="warning" type="button">Review</button><button class="filter" data-compat-filter="info" type="button">Info</button></div><div class="result-tools"><label class="search-box"><span class="visually-hidden">Search conflicts</span><input id="compatSearch" type="search" placeholder="Search conflicts…"></label></div></div>
+      <div id="compatList" class="result-list"></div><div id="compatEmpty" class="empty-state hidden"><strong>No conflicts match this view.</strong><span>Try another filter or search.</span></div>
+      <div class="report-bar"><div><strong>Save the compatibility report</strong><span>Exports contain paths and conflict metadata, not source-file contents.</span></div><div class="button-row"><button id="compatJson" class="secondary-btn small-btn" type="button">Export JSON</button><button id="compatMd" class="secondary-btn small-btn" type="button">Export Markdown</button><button id="compatCopy" class="ghost-btn small-btn" type="button">Copy report</button></div></div>
+    </section>
+    <section class="explain-section"><div class="section-heading"><div><p class="eyebrow">INTERPRETING RESULTS</p><h2>Overlap is not automatically incompatibility.</h2></div><p>Localization overrides and shared file paths can be intentional. Duplicate object IDs and overlapping <code>replace_path</code> are stronger signals.</p></div><div class="explain-grid"><article><span class="explain-number">01</span><h3>Exact paths</h3><p>Two different files at the same relative path depend on load order.</p></article><article><span class="explain-number">02</span><h3>Game IDs</h3><p>Focus, event, state, journal and state-region identifiers are compared by game.</p></article><article><span class="explain-number">03</span><h3>replace_path</h3><p>Broad replacements can hide whole content trees from the other mod.</p></article></div></section>
+  </main>
+  <footer><div><strong>Paradox Doctor</strong><span>Unofficial community tool. Not affiliated with Paradox Interactive.</span></div><nav><a href="./#workspace">Diagnose</a><a href="regression.html">Regression</a><a href="guides.html">Guides</a><a href="feedback.html">Feedback</a><a href="privacy.html">Privacy</a></nav></footer>
+  <script src="compatibility-engine.js"></script><script src="compatibility.js"></script>
+</body>
+</html>
