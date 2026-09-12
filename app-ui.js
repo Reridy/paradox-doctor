@@ -1,5 +1,25 @@
 'use strict';
 
+const FINDING_GROUP_BATCH = 20;
+const FINDING_FLAT_BATCH = 50;
+const FINDING_VIEW_KEY = 'paradoxDoctorFindingsViewV1';
+const findingView = {
+  mode: safeGet(FINDING_VIEW_KEY) === 'flat' ? 'flat' : 'grouped',
+  groupOpen: new Map(),
+  groupLimits: new Map(),
+  flatLimit: FINDING_FLAT_BATCH
+};
+
+(() => {
+  const script = document.currentScript;
+  if (!script?.src || document.querySelector('link[data-pd-results-view]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = new URL('results-view.css', script.src).href;
+  link.dataset.pdResultsView = 'true';
+  document.head.appendChild(link);
+})();
+
 function visibleFindings(){
   const q=state.search.toLowerCase();
   return state.findings.filter(x=>state.showIgnored||!state.ignored.has(fingerprint(x))).filter(x=>!state.newOnly||!state.baseline.size||!state.baseline.has(fingerprint(x))).filter(x=>state.filter==='all'||(state.filter==='root'?x.root:x.severity===state.filter)).filter(x=>state.category==='all'||x.category===state.category).filter(x=>!q||`${x.title} ${x.file} ${x.explanation} ${x.category}`.toLowerCase().includes(q));
@@ -17,8 +37,119 @@ function defaultAction(x){
   return pdText('Make the smallest change related to this finding, reproduce once, then compare the next diagnosis.','이 결과와 관련된 최소한의 변경만 적용하고 한 번 재현한 뒤 다음 진단과 비교하세요.');
 }
 
+function resetFindingView(){
+  findingView.groupOpen.clear();
+  findingView.groupLimits.clear();
+  findingView.flatLimit=FINDING_FLAT_BATCH;
+}
+function findingGroupPriority(items){
+  if(items.some(x=>x.root))return 0;
+  if(items.some(x=>x.severity==='error'))return 1;
+  if(items.some(x=>x.severity==='warning'))return 2;
+  return 3;
+}
+function findingGroupStats(items){
+  const counts={root:0,error:0,warning:0,info:0};
+  items.forEach(x=>{if(x.root)counts.root++;counts[x.severity]=(counts[x.severity]||0)+1;});
+  return counts;
+}
+function groupedFindings(items){
+  const map=new Map();
+  for(const x of items){const key=x.category||pdText('General','일반');if(!map.has(key))map.set(key,[]);map.get(key).push(x);}
+  return [...map.entries()].sort((a,b)=>findingGroupPriority(a[1])-findingGroupPriority(b[1])||b[1].length-a[1].length||a[0].localeCompare(b[0]));
+}
+function ensureFindingNavigator(){
+  let nav=$('#findingNavigator');
+  if(nav)return nav;
+  nav=document.createElement('div');
+  nav.id='findingNavigator';
+  nav.className='result-navigation sticky-ready';
+  nav.innerHTML=`<div class="result-navigation-left"><span id="findingViewCount" class="result-navigation-count"></span><div class="view-mode-tabs" role="group" aria-label="${pdText('Finding display mode','결과 표시 방식')}"><button class="view-mode-btn" data-view-mode="grouped" type="button">${pdText('Grouped','그룹')}</button><button class="view-mode-btn" data-view-mode="flat" type="button">${pdText('Flat list','전체 목록')}</button></div></div><div id="findingGroupActions" class="result-navigation-actions"><button class="result-nav-btn" data-collapse-groups type="button">${pdText('Collapse all','모두 접기')}</button><button class="result-nav-btn" data-expand-groups type="button">${pdText('Expand all','모두 펼치기')}</button></div>`;
+  $('#resultList').before(nav);
+  $$('[data-view-mode]',nav).forEach(button=>button.addEventListener('click',()=>{
+    findingView.mode=button.dataset.viewMode;
+    safeSet(FINDING_VIEW_KEY,findingView.mode);
+    findingView.flatLimit=FINDING_FLAT_BATCH;
+    renderFindingList();
+  }));
+  $('[data-collapse-groups]',nav).addEventListener('click',()=>{
+    groupedFindings(visibleFindings()).forEach(([key])=>findingView.groupOpen.set(key,false));
+    renderFindingList();
+  });
+  $('[data-expand-groups]',nav).addEventListener('click',()=>{
+    groupedFindings(visibleFindings()).forEach(([key])=>findingView.groupOpen.set(key,true));
+    renderFindingList();
+  });
+  return nav;
+}
+function updateFindingNavigator(visible,groups){
+  const nav=ensureFindingNavigator();
+  nav.classList.toggle('hidden',!visible.length);
+  const count=$('#findingViewCount');
+  count.textContent=findingView.mode==='grouped'
+    ?pdText(`${visible.length} findings · ${groups.length} groups`,`${visible.length}개 결과 · ${groups.length}개 그룹`)
+    :pdText(`${visible.length} findings`,`${visible.length}개 결과`);
+  $$('[data-view-mode]',nav).forEach(button=>button.classList.toggle('active',button.dataset.viewMode===findingView.mode));
+  $('#findingGroupActions').classList.toggle('hidden',findingView.mode!=='grouped');
+}
+function renderFindingCard(x){
+  const st=findingStatus(x),card=document.createElement('article');card.className=`finding${st.isNew?' new':''}${st.ignored?' ignored':''}`;
+  const badgeRoot=x.root?`<span class="badge root">${pdText('likely root','유력 원인')}</span>`:'';const badgeNew=st.isNew?`<span class="badge new">${pdText('new','신규')}</span>`:'';const heuristic=x.heuristic?`<span class="badge">${pdText('heuristic','추정')}</span>`:'';
+  card.innerHTML=`<div class="finding-main"><div class="finding-top"><div class="finding-title-wrap"><span class="severity-mark ${x.root?'root':x.severity}"></span><div><h3>${escapeHtml(x.title)}${x.frequency>1?` ×${x.frequency}`:''}</h3><div class="finding-meta">${escapeHtml(x.category)} · ${escapeHtml(x.file)}:${x.line} · ${escapeHtml(x.confidence)} ${pdText('confidence','신뢰도')}</div></div></div><div class="finding-badges">${badgeRoot}${badgeNew}${heuristic}</div></div><p class="finding-explanation">${escapeHtml(x.explanation)}</p><details><summary>${pdText('What should I do?','무엇을 해야 하나요?')}</summary><div class="finding-detail"><div class="next-action"><strong>${pdText('Next action','다음 조치')}</strong><br>${escapeHtml(x.action||defaultAction(x))}</div><div class="finding-actions"><button class="text-btn" data-copy type="button">${pdText('Copy finding','결과 복사')}</button><button class="text-btn" data-ignore type="button">${st.ignored?pdText('Unignore','무시 해제'):pdText('Ignore this pattern','이 패턴 무시')}</button>${x.guide?`<a class="quiet-link" href="${escapeHtml(x.guide)}">${pdText('Open guide →','가이드 열기 →')}</a>`:''}</div></div></details></div>`;
+  $('[data-copy]',card).addEventListener('click',async e=>{await navigator.clipboard.writeText(`[${profiles[state.game].short}] ${x.title}\n${x.file}:${x.line}\n${x.explanation}\n${pdText('Next','다음')}: ${x.action||defaultAction(x)}`);const old=e.target.textContent;e.target.textContent=pdText('Copied','복사됨');setTimeout(()=>e.target.textContent=old,900);});
+  $('[data-ignore]',card).addEventListener('click',()=>{const f=fingerprint(x);if(state.ignored.has(f))state.ignored.delete(f);else state.ignored.add(f);saveIgnored();renderResults();});
+  return card;
+}
+function defaultGroupOpen(items,index,totalVisible){
+  if(totalVisible<=30)return true;
+  if(items.some(x=>x.root))return true;
+  return index===0&&items.some(x=>x.severity==='error');
+}
+function renderGroupedFindingList(list,visible,groups){
+  const wrap=document.createElement('div');wrap.className='finding-groups';
+  groups.forEach(([key,items],index)=>{
+    if(!findingView.groupOpen.has(key))findingView.groupOpen.set(key,defaultGroupOpen(items,index,visible.length));
+    const isOpen=findingView.groupOpen.get(key),stats=findingGroupStats(items),limit=findingView.groupLimits.get(key)||FINDING_GROUP_BATCH,shown=Math.min(limit,items.length);
+    const section=document.createElement('section');section.className='finding-group';
+    const bodyId=`finding-group-${index}`;
+    const statBits=[];
+    if(stats.root)statBits.push(`<span class="group-stat root">${pdText(`${stats.root} roots`,`${stats.root} 원인`)}</span>`);
+    if(stats.error)statBits.push(`<span class="group-stat error">${pdText(`${stats.error} errors`,`${stats.error} 오류`)}</span>`);
+    if(stats.warning)statBits.push(`<span class="group-stat warning">${pdText(`${stats.warning} warnings`,`${stats.warning} 경고`)}</span>`);
+    if(stats.info)statBits.push(`<span class="group-stat">${pdText(`${stats.info} notes`,`${stats.info} 참고`)}</span>`);
+    section.innerHTML=`<button class="group-toggle" type="button" aria-expanded="${isOpen}" aria-controls="${bodyId}"><span class="finding-group-title"><span class="finding-group-chevron" aria-hidden="true">›</span><span class="finding-group-name">${escapeHtml(key)}</span><span class="finding-group-total">${items.length}</span></span><span class="finding-group-stats">${statBits.join('')}</span></button><div id="${bodyId}" class="finding-group-body"${isOpen?'':' hidden'}><div class="finding-group-list"></div></div>`;
+    const toggle=$('.group-toggle',section),body=$('.finding-group-body',section),groupList=$('.finding-group-list',section);
+    toggle.addEventListener('click',()=>{
+      findingView.groupOpen.set(key,!findingView.groupOpen.get(key));
+      const open=findingView.groupOpen.get(key);toggle.setAttribute('aria-expanded',String(open));body.classList.toggle('hidden',!open);
+    });
+    items.slice(0,shown).forEach(x=>groupList.appendChild(renderFindingCard(x)));
+    if(shown<items.length){
+      const more=document.createElement('div');more.className='finding-more-row';
+      more.innerHTML=`<button class="finding-more-btn" type="button">${pdText(`Show ${Math.min(FINDING_GROUP_BATCH,items.length-shown)} more`,`다음 ${Math.min(FINDING_GROUP_BATCH,items.length-shown)}개 보기`)}</button><span class="finding-more-note">${pdText(`${shown} of ${items.length} shown`,`${items.length}개 중 ${shown}개 표시`)}</span>`;
+      $('button',more).addEventListener('click',()=>{findingView.groupLimits.set(key,limit+FINDING_GROUP_BATCH);renderFindingList();});
+      body.appendChild(more);
+    }
+    wrap.appendChild(section);
+  });
+  list.appendChild(wrap);
+}
+function renderFlatFindingList(list,visible){
+  const wrap=document.createElement('div');wrap.className='flat-findings';
+  visible.slice(0,findingView.flatLimit).forEach(x=>wrap.appendChild(renderFindingCard(x)));
+  list.appendChild(wrap);
+  if(findingView.flatLimit<visible.length){
+    const more=document.createElement('div');more.className='flat-load-more';
+    const amount=Math.min(FINDING_FLAT_BATCH,visible.length-findingView.flatLimit);
+    more.innerHTML=`<button class="finding-more-btn" type="button">${pdText(`Show ${amount} more`,`다음 ${amount}개 보기`)}</button><div class="finding-more-note">${pdText(`${Math.min(findingView.flatLimit,visible.length)} of ${visible.length} shown`,`${visible.length}개 중 ${Math.min(findingView.flatLimit,visible.length)}개 표시`)}</div>`;
+    $('button',more).addEventListener('click',()=>{findingView.flatLimit+=FINDING_FLAT_BATCH;renderFindingList();});
+    list.appendChild(more);
+  }
+}
+
 function showResults(findings,meta={}){
   state.findings=findings; state.lastScan={game:state.game,at:new Date().toISOString(),files:state.fileData.size,hasLog:meta.hasLog,referenceFiles:state.referenceData.size};
+  resetFindingView();
   $('#results').classList.remove('hidden'); populateCategoryFilter(); renderResults(); $('#results').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderResults(){
@@ -37,19 +168,15 @@ function renderResults(){
 }
 function populateCategoryFilter(){const current=state.category;const cats=[...new Set(state.findings.map(x=>x.category))].sort();$('#categoryFilter').innerHTML=`<option value="all">${pdText('All categories','모든 카테고리')}</option>`+cats.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');state.category=cats.includes(current)?current:'all';$('#categoryFilter').value=state.category;}
 function renderFindingList(){
-  const list=$('#resultList'), visible=visibleFindings();list.innerHTML='';$('#emptyResults').classList.toggle('hidden',visible.length>0);
-  for(const x of visible.slice(0,600)){
-    const st=findingStatus(x), card=document.createElement('article');card.className=`finding${st.isNew?' new':''}${st.ignored?' ignored':''}`;
-    const badgeRoot=x.root?`<span class="badge root">${pdText('likely root','유력 원인')}</span>`:'';const badgeNew=st.isNew?`<span class="badge new">${pdText('new','신규')}</span>`:'';const heuristic=x.heuristic?`<span class="badge">${pdText('heuristic','추정')}</span>`:'';
-    card.innerHTML=`<div class="finding-main"><div class="finding-top"><div class="finding-title-wrap"><span class="severity-mark ${x.root?'root':x.severity}"></span><div><h3>${escapeHtml(x.title)}${x.frequency>1?` ×${x.frequency}`:''}</h3><div class="finding-meta">${escapeHtml(x.category)} · ${escapeHtml(x.file)}:${x.line} · ${escapeHtml(x.confidence)} ${pdText('confidence','신뢰도')}</div></div></div><div class="finding-badges">${badgeRoot}${badgeNew}${heuristic}</div></div><p class="finding-explanation">${escapeHtml(x.explanation)}</p><details><summary>${pdText('What should I do?','무엇을 해야 하나요?')}</summary><div class="finding-detail"><div class="next-action"><strong>${pdText('Next action','다음 조치')}</strong><br>${escapeHtml(x.action||defaultAction(x))}</div><div class="finding-actions"><button class="text-btn" data-copy type="button">${pdText('Copy finding','결과 복사')}</button><button class="text-btn" data-ignore type="button">${st.ignored?pdText('Unignore','무시 해제'):pdText('Ignore this pattern','이 패턴 무시')}</button>${x.guide?`<a class="quiet-link" href="${escapeHtml(x.guide)}">${pdText('Open guide →','가이드 열기 →')}</a>`:''}</div></div></details></div>`;
-    $('[data-copy]',card).addEventListener('click',async e=>{await navigator.clipboard.writeText(`[${profiles[state.game].short}] ${x.title}\n${x.file}:${x.line}\n${x.explanation}\n${pdText('Next','다음')}: ${x.action||defaultAction(x)}`);const old=e.target.textContent;e.target.textContent=pdText('Copied','복사됨');setTimeout(()=>e.target.textContent=old,900);});
-    $('[data-ignore]',card).addEventListener('click',()=>{const f=fingerprint(x);if(state.ignored.has(f))state.ignored.delete(f);else state.ignored.add(f);saveIgnored();renderResults();});
-    list.appendChild(card);
-  }
-  if(visible.length>600){const n=document.createElement('div');n.className='empty-state';n.innerHTML=`<strong>${pdText(`Showing the first 600 of ${visible.length} findings.`,`${visible.length}개 결과 중 처음 600개를 표시합니다.`)}</strong><span>${pdText('Export the report for the complete list.','전체 목록은 보고서를 내보내 확인하세요.')}</span>`;list.appendChild(n);}
+  const list=$('#resultList'),visible=visibleFindings(),groups=groupedFindings(visible);list.innerHTML='';
+  $('#emptyResults').classList.toggle('hidden',visible.length>0);
+  updateFindingNavigator(visible,groups);
+  if(!visible.length)return;
+  if(findingView.mode==='grouped')renderGroupedFindingList(list,visible,groups);else renderFlatFindingList(list,visible);
 }
+function refreshFindingView(){resetFindingView();renderFindingList();}
 
-function clearResults(message='') { state.findings=[]; state.lastScan=null; $('#results').classList.add('hidden'); if(message){$('#readyLabel').textContent=message;$('#readyDetail').textContent=pdText('Existing results were cleared to avoid mixing game profiles.','다른 게임 프로필의 결과가 섞이지 않도록 기존 결과를 지웠습니다.');} }
+function clearResults(message='') { state.findings=[]; state.lastScan=null; resetFindingView(); $('#results').classList.add('hidden'); const nav=$('#findingNavigator');if(nav)nav.classList.add('hidden'); if(message){$('#readyLabel').textContent=message;$('#readyDetail').textContent=pdText('Existing results were cleared to avoid mixing game profiles.','다른 게임 프로필의 결과가 섞이지 않도록 기존 결과를 지웠습니다.');} }
 
 function reportObject(){return{schema:'paradox-doctor-report-v4',scan:state.lastScan,coverage:state.scanCoverage,issues:state.findings};}
 function markdownReport(){const o=reportObject();let md=`# Paradox Doctor report\n\n- Game: ${profiles[state.game].name}\n- Generated: ${o.scan?.at||new Date().toISOString()}\n- Project files: ${o.scan?.files||0}\n- error.log: ${o.scan?.hasLog?'included':'not included'}\n- Reference files: ${o.scan?.referenceFiles||0}\n- Findings: ${o.issues.length}\n\n## Coverage\n${o.coverage.map(x=>`- ${x}`).join('\n')}\n\n`;for(const x of o.issues)md+=`## ${x.root?'[Likely root] ':''}${x.title}\n- Severity: ${x.severity}\n- Category: ${x.category}\n- Confidence: ${x.confidence}${x.heuristic?' (heuristic)':''}\n- Location: ${x.file}:${x.line}\n- Repeats: ${x.frequency}\n\n${x.explanation}\n\nNext action: ${x.action||defaultAction(x)}\n\n`;return md;}
@@ -65,8 +192,8 @@ function bindUI(){
   const drop=$('#logDropZone');['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('dragover')}));drop.addEventListener('drop',e=>{const f=[...e.dataTransfer.files].find(x=>/\.(log|txt)$/i.test(x.name));if(f)setLogFile(f);});
   $('#referenceInput').addEventListener('change',e=>loadReference([...e.target.files]));$('#gameVersionInput').addEventListener('input',e=>state.gameVersion=e.target.value.trim());
   $('#runBtn').addEventListener('click',runDiagnosis);$('#cancelBtn').addEventListener('click',()=>state.cancel=true);$('#clearWorkspaceBtn').addEventListener('click',clearWorkspace);
-  $$('.filter').forEach(b=>b.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.filter=b.dataset.severity;renderFindingList();}));
-  $('#categoryFilter').addEventListener('change',e=>{state.category=e.target.value;renderFindingList();});$('#searchInput').addEventListener('input',e=>{state.search=e.target.value;renderFindingList();});$('#newOnlyToggle').addEventListener('change',e=>{state.newOnly=e.target.checked;renderFindingList();});$('#showIgnoredToggle').addEventListener('change',e=>{state.showIgnored=e.target.checked;renderFindingList();});
+  $$('.filter').forEach(b=>b.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.filter=b.dataset.severity;refreshFindingView();}));
+  $('#categoryFilter').addEventListener('change',e=>{state.category=e.target.value;refreshFindingView();});$('#searchInput').addEventListener('input',e=>{state.search=e.target.value;refreshFindingView();});$('#newOnlyToggle').addEventListener('change',e=>{state.newOnly=e.target.checked;refreshFindingView();});$('#showIgnoredToggle').addEventListener('change',e=>{state.showIgnored=e.target.checked;refreshFindingView();});
   $('#saveBaselineBtn').addEventListener('click',saveCurrentBaseline);$('#clearBaselineBtn').addEventListener('click',clearBaseline);$('#importBaselineBtn').addEventListener('click',()=>$('#baselineInput').click());$('#baselineInput').addEventListener('change',e=>{if(e.target.files[0])importBaseline(e.target.files[0]);});
   $('#exportJsonBtn').addEventListener('click',()=>download(`paradox-doctor-${state.game}.json`,JSON.stringify(reportObject(),null,2),'application/json'));$('#exportMdBtn').addEventListener('click',()=>download(`paradox-doctor-${state.game}.md`,markdownReport(),'text/markdown'));$('#copyReportBtn').addEventListener('click',async e=>{await navigator.clipboard.writeText(markdownReport());const old=e.target.textContent;e.target.textContent=pdText('Copied','복사됨');setTimeout(()=>e.target.textContent=old,900);});
   const dialog=$('#logDialog');$('#logLocationBtn').addEventListener('click',()=>dialog.showModal());$('#closeLogDialog').addEventListener('click',()=>dialog.close());
