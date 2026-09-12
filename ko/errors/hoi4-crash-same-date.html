@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="호이4 모드가 매번 같은 날짜에 튕길 때, 그 날짜를 단서로 event, focus, decision, on_action, AI 행동과 scripted effect를 좁히는 방법입니다.">
+  <meta property="og:title" content="호이4가 같은 날짜에서 계속 튕길 때 — Paradox Doctor">
+  <meta property="og:description" content="반복 가능한 날짜 기반 Hearts of Iron IV 모드 크래시를 체계적으로 추적하는 방법입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-crash-same-date.html">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-crash-same-date.html">
+  <link rel="alternate" hreflang="en" href="https://reridy.github.io/paradox-doctor/errors/hoi4-crash-same-date.html">
+  <link rel="alternate" hreflang="ko" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-crash-same-date.html">
+  <link rel="alternate" hreflang="x-default" href="https://reridy.github.io/paradox-doctor/errors/hoi4-crash-same-date.html">
+  <title>호이4가 같은 날짜에서 계속 튕길 때 — Paradox Doctor</title>
+  <link rel="stylesheet" href="../../style.css">
+  <script src="../../language.js"></script>
+  <script src="../../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">진단</a><a href="../../guides.html">가이드</a><a href="../../privacy.html">개인정보</a><a data-language-choice="en" href="../../errors/hoi4-crash-same-date.html">English</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 크래시 가이드</p>
+  <h1>호이4가 같은 날짜에서 계속 튕길 때</h1>
+  <p>게임 내에서 항상 같은 날짜에 크래시한다는 것은 매우 유용한 단서입니다. 그 시점에 항상 평가되거나 완료되는 작업이 있을 가능성이 있으므로 모드 전체를 뒤지기보다 그 날짜에 실행될 수 있는 콘텐츠부터 좁혀보는 것이 좋습니다.</p>
+
+  <div class="page-card"><h2>빠른 답</h2><p>크래시 직전 세이브를 불러와 한 번 재현한 뒤 최신 로그를 확인하세요. 그 날짜에 실행될 수 있는 예약 event, focus 완료, decision, on_action, scripted effect, AI 콘텐츠와 state 변경을 우선 확인합니다.</p></div>
+
+  <div class="page-card"><h2>왜 날짜가 중요한가?</h2><ul><li>그날 national focus가 완료될 수 있습니다.</li><li>event 또는 decision의 제한 시간이 끝날 수 있습니다.</li><li>주기적인 on_action이나 scripted check가 실행될 수 있습니다.</li><li>플레이어가 직접 건드리지 않아도 AI 국가가 같은 깨진 콘텐츠를 실행할 수 있습니다.</li><li>전쟁, 합병, state 이전, tag 전환 같은 상태 변화가 특정 시점에서만 잘못된 참조를 드러낼 수 있습니다.</li></ul></div>
+
+  <div class="page-card"><h2>원인 격리 순서</h2><ol><li>재현되는 크래시보다 하루나 이틀 전 세이브를 보관합니다.</li><li>한 번 실행해 크래시를 재현하고 멈춥니다. 다른 실행으로 유용한 최신 로그를 덮어쓰지 마세요.</li><li><code>error.log</code> 끝부분 근처에서 새로 나온 메시지부터 확인합니다.</li><li>그 메시지에 등장한 event ID, focus ID, state ID, 파일 경로를 프로젝트에서 검색합니다.</li><li>의심되는 event chain, focus 완료, 주기 스크립트를 한 번에 하나씩 임시로 비활성화해 봅니다.</li><li>크래시 날짜가 움직이거나 사라지면 의심 블록을 더 작게 줄입니다.</li></ol></div>
+
+  <div class="page-card"><h2>마지막 로그 줄이 원인이라고 단정하지 마세요</h2><p>마지막 메시지는 단순 증상일 수 있고, 일부 치명적인 오류는 <code>error.log</code>에 유용한 내용을 거의 남기지 않을 수도 있습니다. 로그와 최근 프로젝트 변경 사항, 그리고 그 날짜에 시뮬레이션이 실행할 작업을 함께 비교하세요.</p></div>
+
+  <div class="page-card"><h2>Paradox Doctor 활용</h2><p>일반 진단으로 반복 로그를 묶고 프로젝트 구조를 확인할 수 있습니다. 최근 수정 뒤부터 크래시가 생겼다면 Project Regression Doctor로 마지막 정상 폴더와 깨진 폴더를 비교해 경로 위험도, 구조 차이, 로그 언급을 기준으로 변경 파일의 우선순위를 볼 수 있습니다.</p><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">최신 error.log 분석</a><a class="secondary-btn" href="../../regression.html">정상/깨진 버전 비교</a></div></div>
+
+  <div class="page-card"><h2>관련 문제</h2><p><a href="hoi4-error-log-guide.html">error.log에서 실제 오류 찾기</a> · <a href="../../errors/hoi4-mod-broken-after-update.html">게임 업데이트 후 모드가 망가짐</a> · <a href="../../errors/unexpected-token.html">Unexpected token / parser cascade</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>비공식 커뮤니티 도구이며 Paradox Interactive와 제휴 관계가 없습니다.</span></div><nav><a href="../../guides.html">Guides</a><a href="../../about.html">About</a><a href="../../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

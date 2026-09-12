@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="호이4 국가중점이 안 뜰 때 focus_tree 구조, 국가 선택 조건, ID, prerequisite, 파일 로딩과 현지화를 확인하는 순서를 설명합니다.">
+  <meta property="og:title" content="호이4 국가중점이 안 뜰 때 해결 방법 — Paradox Doctor">
+  <meta property="og:description" content="Hearts of Iron IV에서 커스텀 focus tree가 표시되지 않거나 기본 중점 트리가 뜨는 문제를 점검하는 방법입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-focus-tree-not-showing.html">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-focus-tree-not-showing.html">
+  <link rel="alternate" hreflang="en" href="https://reridy.github.io/paradox-doctor/errors/hoi4-focus-tree-not-showing.html">
+  <link rel="alternate" hreflang="ko" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-focus-tree-not-showing.html">
+  <link rel="alternate" hreflang="x-default" href="https://reridy.github.io/paradox-doctor/errors/hoi4-focus-tree-not-showing.html">
+  <title>호이4 국가중점이 안 뜰 때 해결 방법 — Paradox Doctor</title>
+  <link rel="stylesheet" href="../../style.css">
+  <script src="../../language.js"></script>
+  <script src="../../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">진단</a><a href="../../guides.html">가이드</a><a href="../../privacy.html">개인정보</a><a data-language-choice="en" href="../../errors/hoi4-focus-tree-not-showing.html">English</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 국가중점 가이드</p>
+  <h1>호이4 국가중점이 안 뜰 때</h1>
+  <p>커스텀 국가가 계속 기본 중점 트리를 받거나, 만든 중점 트리가 전혀 활성화되지 않는다면 개별 focus 내용보다 먼저 트리 선택 조건, 구조, 파일 로딩을 확인하는 것이 좋습니다.</p>
+
+  <div class="page-card"><h2>빠른 답</h2><p>파일이 실제로 로드되는지, 최상위 <code>focus_tree</code> 블록이 유효한지, 트리 ID가 고유한지, 국가 선택 조건이 목표 국가를 실제로 선택할 수 있는지 확인하세요. 그 다음 중복 focus ID와 잘못된 prerequisite를 확인합니다.</p></div>
+
+  <div class="page-card"><h2>트리 선택 조건부터 확인</h2><ul><li><code>focus_tree</code> 블록이 정상적으로 파싱되어야 합니다.</li><li>트리 ID는 고유하고 안정적으로 유지하는 것이 좋습니다.</li><li>국가 선택 조건이 의도한 국가 또는 original tag와 실제로 일치해야 합니다.</li><li>여러 트리가 동시에 조건을 만족하면 선택 로직이 서로 경쟁할 수 있습니다.</li><li>파일 경로가 잘못됐거나 파일 구조가 깨졌다면 예상대로 로드되지 않을 수 있습니다.</li></ul></div>
+
+  <div class="page-card"><h2>그 다음 focus 단위 문제 확인</h2><ol><li>선택한 파일들 사이에 중복 focus ID가 있는지 확인합니다.</li><li>prerequisite가 현재 로드된 콘텐츠에 실제로 존재하는 focus를 참조하는지 확인합니다.</li><li>첫 focus 정의 주변의 중괄호 균형을 점검합니다.</li><li>파일 앞쪽의 parser 오류 때문에 뒤쪽 focus가 로드되지 않는지 확인합니다.</li><li>현지화 문제는 따로 봅니다. 텍스트가 raw key로 보인다고 focus 오브젝트 자체가 로드되지 않은 것은 아닙니다.</li></ol></div>
+
+  <div class="page-card"><h2>기본 중점 트리인가, 깨진 커스텀 트리인가?</h2><p>게임이 깔끔하게 기본 중점 트리로 돌아간다면 선택 조건을 우선 의심할 만합니다. 반대로 UI 일부만 나오거나 로그에 focus 파싱/참조 오류가 보인다면 커스텀 트리 구조와 ID부터 확인하세요.</p></div>
+
+  <div class="page-card"><h2>Paradox Doctor가 확인할 수 있는 것</h2><ul><li>선택된 파일의 중복 focus ID</li><li>지원되는 prerequisite 참조 추정 검사</li><li>중괄호 불균형과 parser 관련 로그 메시지</li><li>focus 현지화/참조 관련 추정 검사</li><li>예전에는 작동했던 프로젝트 버전과의 회귀 비교</li></ul><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">focus 파일 검사</a><a class="secondary-btn" href="../../regression.html">정상 버전과 비교</a></div></div>
+
+  <div class="page-card"><h2>관련 가이드</h2><p><a href="../../errors/unexpected-token.html">Unexpected token</a> · <a href="../../errors/hoi4-localization-raw-key.html">현지화 raw key 문제</a> · <a href="hoi4-error-log-guide.html">error.log 보는 법</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>비공식 커뮤니티 도구이며 Paradox Interactive와 제휴 관계가 없습니다.</span></div><nav><a href="../../guides.html">Guides</a><a href="../../about.html">About</a><a href="../../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

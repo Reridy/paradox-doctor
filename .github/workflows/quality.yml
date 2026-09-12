@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 22
       - run: node --check analytics.js
+      - run: node --check language.js
       - run: node --check app-core.js
       - run: node --check app-game-checks.js
       - run: node --check app-log-runner.js

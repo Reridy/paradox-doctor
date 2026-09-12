@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://reridy.github.io/paradox-doctor/</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/ko/</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/regression.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/compatibility.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/guides.html</loc></url>
@@ -10,10 +11,14 @@
   <url><loc>https://reridy.github.io/paradox-doctor/games/hoi4.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/games/victoria3.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-mod-crash-after-adding-state.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/ko/errors/hoi4-mod-crash-after-adding-state.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-crash-same-date.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/ko/errors/hoi4-crash-same-date.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-error-log-guide.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/ko/errors/hoi4-error-log-guide.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-mod-broken-after-update.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-focus-tree-not-showing.html</loc></url>
+  <url><loc>https://reridy.github.io/paradox-doctor/ko/errors/hoi4-focus-tree-not-showing.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/hoi4-localization-raw-key.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/vic3-thousands-of-errors.html</loc></url>
   <url><loc>https://reridy.github.io/paradox-doctor/errors/vic3-journal-entry-not-working.html</loc></url>
