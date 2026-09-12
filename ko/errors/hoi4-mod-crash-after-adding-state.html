@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="호이4에서 state를 추가하거나 분리한 뒤 모드가 튕길 때 province 중복, strategic region, state 구조와 지도 참조를 확인하는 순서입니다.">
+  <meta property="og:title" content="호이4 state 추가 후 크래시 해결 방법 — Paradox Doctor">
+  <meta property="og:description" content="새로 추가하거나 분리한 state 때문에 Hearts of Iron IV 모드가 크래시할 때 확인할 실전 체크리스트입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-mod-crash-after-adding-state.html">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-mod-crash-after-adding-state.html">
+  <link rel="alternate" hreflang="en" href="https://reridy.github.io/paradox-doctor/errors/hoi4-mod-crash-after-adding-state.html">
+  <link rel="alternate" hreflang="ko" href="https://reridy.github.io/paradox-doctor/ko/errors/hoi4-mod-crash-after-adding-state.html">
+  <link rel="alternate" hreflang="x-default" href="https://reridy.github.io/paradox-doctor/errors/hoi4-mod-crash-after-adding-state.html">
+  <title>호이4 state 추가 후 크래시 해결 방법 — Paradox Doctor</title>
+  <link rel="stylesheet" href="../../style.css">
+  <script src="../../language.js"></script>
+  <script src="../../analytics.js" defer></script>
+</head>
+<body data-game="hoi4">
+<header class="site-header"><a class="brand" href="../?game=hoi4"><span class="brand-mark">PD</span><span>Paradox Doctor</span></a><nav><a href="../?game=hoi4#workspace">진단</a><a href="../../guides.html">가이드</a><a href="../../privacy.html">개인정보</a><a data-language-choice="en" href="../../errors/hoi4-mod-crash-after-adding-state.html">English</a></nav></header>
+<main class="page">
+  <p class="eyebrow">HOI4 크래시 가이드</p>
+  <h1>호이4에서 state를 추가한 뒤 크래시할 때</h1>
+  <p>Hearts of Iron IV가 국가 선택 화면까지는 정상적으로 들어가지만 캠페인을 시작한 뒤 크래시하고, 새 state를 제거하면 다시 정상 작동한다면 먼저 여러 파일에 걸친 지도 데이터 문제로 보는 것이 좋습니다.</p>
+
+  <div class="page-card"><h2>빠른 답</h2><p>관련 없는 경고를 쫓기 전에 province 소속부터 확인하세요. 새 state 또는 분리한 state는 같은 province가 기존 state에도 남아 있거나, strategic region 정의가 새 지도와 맞지 않거나, state 블록 구조가 깨졌거나, 분리 과정에서 필요한 state/map 데이터가 제대로 옮겨지지 않아 문제가 생길 수 있습니다.</p></div>
+
+  <div class="page-card"><h2>전형적인 증상</h2><ul><li>메뉴 또는 국가 선택 지도까지는 로드됩니다.</li><li>국가를 시작하면 캠페인 로딩 중 CTD가 발생합니다.</li><li>새 state 파일을 제거하면 정상적으로 로드됩니다.</li><li><code>error.log</code>에 크래시 원인처럼 보이지 않는 경고가 많이 나타납니다.</li><li>Nudge나 debug mode에서는 지도가 정상처럼 보여도 다른 파일이 옛 province 구성을 계속 참조할 수 있습니다.</li></ul></div>
+
+  <div class="page-card"><h2>이 원인부터 확인</h2><ol><li><strong>Province 중복:</strong> 하나의 province가 기존 state와 새 state에 동시에 들어가 있지 않은지 확인합니다.</li><li><strong>Strategic region 소속:</strong> 영향을 받은 province가 선택한 strategic-region 파일 사이에서 중복되지 않는지 확인합니다.</li><li><strong>State 구조:</strong> 중괄호, state ID, province 목록, category와 history 블록을 확인합니다.</li><li><strong>분리 과정에서 옮겨야 할 state 데이터:</strong> buildings 데이터를 포함해 유지하려 했던 state 단위 값과 지도 관련 데이터를 다시 확인합니다.</li><li><strong>오래된 생성 파일:</strong> Nudge를 사용했다면 생성된 map/history 파일을 의도적으로 모드로 옮겼는지, 사용자 폴더에 남은 오래된 파일이 같이 로드되고 있지 않은지 확인합니다.</li></ol></div>
+
+  <div class="page-card"><h2>빠르게 원인 격리하기</h2><ol><li>크래시를 한 번 재현하고 최신 <code>error.log</code>를 보관합니다.</li><li>문제 모드와 반드시 필요한 의존성만 켜고 테스트합니다.</li><li>기존 state와 새 state의 province 목록을 나란히 비교합니다.</li><li>같은 province를 strategic region에서도 확인합니다.</li><li>확실히 증명할 수 있는 첫 구조/소속 문제 하나만 수정하고 다시 실행해 새 로그를 만듭니다.</li></ol><p>로그에 있는 모든 경고를 한꺼번에 고치려 하지 마세요. 많은 엔진 메시지는 무관하거나 앞쪽 지도 오류의 결과일 수 있습니다.</p></div>
+
+  <div class="page-card"><h2>Paradox Doctor가 확인할 수 있는 것</h2><ul><li>선택한 파일의 중복 state ID</li><li>여러 state에 동시에 들어간 province</li><li>선택된 strategic region 사이의 중복 province 소속</li><li>중괄호 불균형과 흔한 state/map 로그 패턴</li><li>정상 프로젝트와 깨진 버전 사이의 회귀 비교</li></ul><p>일부 파일만으로 HOI4 지도 전체가 유효하다는 것을 증명할 수는 없습니다. 깨끗한 검사 결과는 제공한 파일이 현재 지원되는 규칙에 걸리지 않았다는 뜻입니다.</p><div class="guide-cta"><a class="primary-btn" href="../?game=hoi4#workspace">프로젝트 + error.log 검사</a><a class="secondary-btn" href="../../errors/hoi4-map-state.html">State & province 참고 가이드</a></div></div>
+
+  <div class="page-card"><h2>관련 문제</h2><p><a href="hoi4-crash-same-date.html">같은 날짜에서 계속 크래시</a> · <a href="hoi4-error-log-guide.html">HOI4 error.log 보는 법</a> · <a href="../../errors/hoi4-mod-broken-after-update.html">게임 업데이트 후 모드가 망가짐</a></p></div>
+</main>
+<footer><div><strong>Paradox Doctor</strong><span>비공식 커뮤니티 도구이며 Paradox Interactive와 제휴 관계가 없습니다.</span></div><nav><a href="../../guides.html">Guides</a><a href="../../about.html">About</a><a href="../../privacy.html">Privacy</a></nav></footer>
+</body>
+</html>

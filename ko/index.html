@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Paradox Doctor는 Hearts of Iron IV와 Victoria 3 모드 프로젝트 및 error.log를 브라우저에서 분석해 유력한 오류 원인을 우선순위로 보여주는 로컬 우선 진단 도구입니다.">
+  <meta name="theme-color" content="#0b0f16">
+  <meta property="og:title" content="Paradox Doctor — HOI4 & Victoria 3 모드 오류 진단">
+  <meta property="og:description" content="프로젝트와 error.log를 로컬에서 검사하고 반복되는 엔진 로그 대신 우선순위가 정리된 게임별 진단 결과를 확인하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://reridy.github.io/paradox-doctor/ko/">
+  <link rel="canonical" href="https://reridy.github.io/paradox-doctor/ko/">
+  <link rel="alternate" hreflang="en" href="https://reridy.github.io/paradox-doctor/">
+  <link rel="alternate" hreflang="ko" href="https://reridy.github.io/paradox-doctor/ko/">
+  <link rel="alternate" hreflang="x-default" href="https://reridy.github.io/paradox-doctor/">
+  <title>Paradox Doctor — HOI4 & Victoria 3 모드 오류 진단</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../language.js"></script>
+  <script src="../analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"Paradox Doctor",
+    "applicationCategory":"DeveloperApplication",
+    "operatingSystem":"Web",
+    "url":"https://reridy.github.io/paradox-doctor/ko/",
+    "description":"Hearts of Iron IV와 Victoria 3를 위한 로컬 우선 모드 오류 진단 도구.",
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+  }
+  </script>
+</head>
+<body data-game="hoi4">
+  <a class="skip-link" href="#workspace">진단 도구로 이동</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Paradox Doctor 홈">
+      <span class="brand-mark" aria-hidden="true">PD</span>
+      <span>Paradox Doctor</span>
+      <span class="beta">v1.0</span>
+    </a>
+    <div class="header-right">
+      <label class="game-switch" for="gameSelect"><span>게임</span><select id="gameSelect"><option value="hoi4">Hearts of Iron IV</option><option value="vic3">Victoria 3</option></select></label>
+      <nav aria-label="주요 탐색"><a href="#workspace">진단</a><a href="../regression.html">버전 비교</a><a href="../compatibility.html">호환성</a><a href="../guides.html">가이드</a><a href="../privacy.html">개인정보</a><a data-language-choice="en" href="../">English</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-kicker"><span id="heroGameBadge">HOI4</span><span>브라우저에서 로컬 진단</span></div>
+      <h1 id="heroTitle">모드가 왜 망가졌는지 찾아보세요.</h1>
+      <p id="heroCopy">Hearts of Iron IV 프로젝트와 최신 <code>error.log</code>를 검사하세요. Paradox Doctor가 반복되는 엔진 메시지를 묶고, 파일 간 흔한 오류를 확인해 무엇부터 조사해야 할지 우선순위를 보여줍니다.</p>
+      <div class="hero-actions"><a class="primary-btn" href="#workspace">진단 도구 열기</a><a class="quiet-link" href="#howItWorks">작동 방식</a></div>
+      <div class="hero-trust" aria-label="제품 특성"><span>브라우저에서 실행</span><span>계정 불필요</span><span>프로젝트 업로드 없음</span><span>HOI4 + Victoria 3</span></div>
+    </section>
+
+    <span id="scanner" class="anchor-alias" aria-hidden="true"></span>
+    <section id="workspace" class="workspace" aria-labelledby="workspaceTitle">
+      <div class="workspace-head">
+        <div><p class="eyebrow">진단 작업공간</p><h2 id="workspaceTitle"><span id="workspaceGameName">Hearts of Iron IV</span></h2><p class="subtle">프로젝트 폴더, error.log 또는 둘 다 추가하세요. 사용 가능한 정보를 한 번의 진단에 함께 반영합니다.</p></div>
+        <button id="clearWorkspaceBtn" class="ghost-btn" type="button">작업공간 비우기</button>
+      </div>
+
+      <div class="input-grid">
+        <section class="input-card" aria-labelledby="projectInputTitle">
+          <div class="input-card-head"><span class="step">1</span><div><h3 id="projectInputTitle">모드 프로젝트</h3><p>파일 간 ID, 현지화, 경로, state와 참조 문제를 확인하는 데 가장 좋습니다.</p></div></div>
+          <div class="picker-row">
+            <label class="picker primary-picker"><input id="folderInput" type="file" webkitdirectory directory multiple><span class="picker-icon">▣</span><span><strong>프로젝트 폴더 선택</strong><small>권장</small></span></label>
+            <label class="picker"><input id="fileInput" type="file" multiple accept=".txt,.yml,.yaml,.log,.mod,.json,.gui,.asset,.csv"><span class="picker-icon">＋</span><span><strong>파일 선택</strong><small>일부 파일만 검사할 때</small></span></label>
+          </div>
+          <div id="projectStatus" class="input-status">프로젝트 파일이 선택되지 않았습니다.</div>
+          <div id="projectSummary" class="chips hidden" aria-live="polite"></div>
+          <button id="clearProjectBtn" class="text-btn hidden" type="button">프로젝트 파일 제거</button>
+        </section>
+
+        <section class="input-card" aria-labelledby="logInputTitle">
+          <div class="input-card-head"><span class="step">2</span><div><h3 id="logInputTitle">error.log</h3><p>최신 로그를 함께 사용하면 실제 오류와 관련 없는 경고를 구분하는 데 도움이 됩니다.</p></div></div>
+          <label id="logDropZone" class="log-picker"><input id="logFileInput" type="file" accept=".log,.txt,text/plain"><span class="picker-icon">↥</span><span><strong>error.log 선택 또는 드롭</strong><small id="logFileLabel">로그 파일이 선택되지 않음</small></span></label>
+          <details class="paste-log"><summary>대신 로그 텍스트 붙여넣기</summary><textarea id="logInput" spellcheck="false" placeholder="error.log 내용을 여기에 붙여넣으세요…"></textarea></details>
+          <div class="inline-actions"><button id="logLocationBtn" class="text-btn" type="button">error.log는 어디에 있나요?</button><button id="clearLogBtn" class="text-btn hidden" type="button">로그 제거</button></div>
+        </section>
+      </div>
+
+      <details class="advanced" id="advancedContext">
+        <summary><span><strong>고급 컨텍스트</strong><small>회귀 기준점, 바닐라/의존성 reference, 현재 게임 버전</small></span><span aria-hidden="true">⌄</span></summary>
+        <div class="advanced-grid">
+          <section class="advanced-card"><h3>회귀 기준점</h3><p>이전 정상 진단에 없었던 새 결과를 표시할 수 있습니다.</p><div id="baselineStatus" class="mini-status">이 게임에 저장된 기준점이 없습니다.</div><div class="button-row"><button id="importBaselineBtn" class="secondary-btn small-btn" type="button">JSON 가져오기</button><input id="baselineInput" class="visually-hidden" type="file" accept=".json,application/json"><button id="clearBaselineBtn" class="ghost-btn small-btn" type="button" disabled>기준점 삭제</button></div></section>
+          <section class="advanced-card"><h3>Reference 폴더 <span class="optional">선택 사항</span></h3><p>로컬 바닐라 또는 의존성 파일과 비교해 같은 경로의 override와 해결되지 않은 참조를 확인합니다.</p><label class="mini-picker"><input id="referenceInput" type="file" webkitdirectory directory multiple><strong>Reference 폴더 선택</strong><span id="referenceStatus">불러온 항목 없음</span></label></section>
+          <section class="advanced-card"><h3>게임 버전 <span class="optional">선택 사항</span></h3><p>모드 descriptor의 <code>supported_version</code>과 비교할 때만 사용됩니다.</p><label class="field-label" for="gameVersionInput">현재 버전<input id="gameVersionInput" type="text" inputmode="decimal" placeholder="예: 1.17.4"></label></section>
+        </div>
+      </details>
+
+      <div class="run-bar">
+        <div><strong id="readyLabel">프로젝트 폴더 또는 error.log를 추가하세요.</strong><span id="readyDetail">파일은 이 기기에서만 처리됩니다.</span></div>
+        <button id="runBtn" class="primary-btn run-btn" type="button" disabled>진단 실행</button>
+      </div>
+      <div id="progressWrap" class="progress-wrap hidden" aria-live="polite"><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div><div class="progress-meta"><span id="progressText">준비 중…</span><button id="cancelBtn" class="text-btn" type="button">취소</button></div></div>
+    </section>
+
+    <section id="results" class="results hidden" aria-labelledby="resultsTitle">
+      <div class="results-summary">
+        <div class="diagnosis-state"><span id="statusDot" class="status-dot"></span><div><p class="eyebrow">진단 결과</p><h2 id="resultsTitle">검토 준비 완료</h2><p id="resultsSubtitle" class="subtle"></p></div></div>
+        <div class="summary-counts"><div><strong id="rootCount">0</strong><span>유력 원인</span></div><div><strong id="errorCount">0</strong><span>오류</span></div><div><strong id="warningCount">0</strong><span>경고</span></div><div><strong id="noteCount">0</strong><span>참고</span></div></div>
+      </div>
+
+      <div id="coverageBar" class="coverage-bar"></div>
+      <section id="startHere" class="start-here hidden"><div class="section-label"><span>여기부터 확인</span><small>우선순위가 낮은 메시지를 보기 전에 먼저 수정하거나 조사하세요.</small></div><ol id="startHereList"></ol></section>
+
+      <div class="results-controls">
+        <div class="filters" role="group" aria-label="결과 필터"><button class="filter active" data-severity="all" type="button">전체</button><button class="filter" data-severity="root" type="button">유력 원인</button><button class="filter" data-severity="error" type="button">오류</button><button class="filter" data-severity="warning" type="button">경고</button><button class="filter" data-severity="info" type="button">참고</button></div>
+        <div class="result-tools"><label class="search-box"><span class="visually-hidden">결과 검색</span><input id="searchInput" type="search" placeholder="결과 검색…"></label><label class="select-label"><span class="visually-hidden">카테고리</span><select id="categoryFilter"><option value="all">모든 카테고리</option></select></label></div>
+        <div class="view-toggles"><label><input id="newOnlyToggle" type="checkbox"> 기준점 이후 신규만</label><label><input id="showIgnoredToggle" type="checkbox"> 무시한 결과 표시</label></div>
+      </div>
+
+      <div id="resultList" class="result-list"></div>
+      <div id="emptyResults" class="empty-state hidden"><strong>현재 보기와 일치하는 결과가 없습니다.</strong><span>필터나 검색어를 지워보세요.</span></div>
+
+      <div class="report-bar">
+        <div><strong>진단 결과 저장 또는 공유</strong><span>보고서에는 진단 결과와 검사 메타데이터만 포함되며 소스 파일은 포함되지 않습니다.</span></div>
+        <div class="button-row"><button id="saveBaselineBtn" class="secondary-btn small-btn" type="button">기준점으로 저장</button><button id="exportJsonBtn" class="secondary-btn small-btn" type="button">JSON 내보내기</button><button id="exportMdBtn" class="secondary-btn small-btn" type="button">Markdown 내보내기</button><button id="copyReportBtn" class="ghost-btn small-btn" type="button">버그 보고서 복사</button></div>
+      </div>
+    </section>
+
+    <section id="howItWorks" class="explain-section">
+      <div class="section-heading"><div><p class="eyebrow">도구가 하는 일</p><h2>유용한 신호를 찾고, 한계도 명확히 표시합니다.</h2></div><p>Paradox Doctor는 확정적인 검사와 명시적으로 표시된 추정 규칙을 함께 사용합니다. 검사 결과가 깨끗하다고 모드에 버그가 없다는 뜻은 아닙니다.</p></div>
+      <div class="explain-grid"><article><span class="explain-number">01</span><h3>프로젝트 분석</h3><p>텍스트 기반 모드 파일, 현지화, ID, 참조와 게임별 구조를 확인합니다.</p></article><article><span class="explain-number">02</span><h3>로그 노이즈 감소</h3><p>반복되는 엔진 메시지를 묶고 추출 가능한 가장 유용한 소스 위치를 보존합니다.</p></article><article><span class="explain-number">03</span><h3>조치 우선순위 결정</h3><p>신뢰도가 높은 구조적 문제를 추정 규칙과 참고 메시지보다 먼저 보여줍니다.</p></article></div>
+    </section>
+
+    <section class="feedback-strip regression-callout"><div><strong>어제는 됐는데 오늘 망가졌나요?</strong><span>마지막 정상 모드 폴더와 망가진 버전을 비교해 중요한 변경 파일을 우선순위로 확인하세요.</span></div><a class="secondary-btn" href="../regression.html">프로젝트 버전 비교</a></section>
+
+    <section class="feedback-strip"><div><strong>두 모드를 같이 켰을 때만 충돌하나요?</strong><span>로드 순서를 추측하기 전에 파일 override, ID, 현지화 키와 replace_path를 비교하세요.</span></div><a class="secondary-btn" href="../compatibility.html">모드 호환성 검사</a></section>
+
+    <section class="guides-section" id="guides">
+      <div class="section-heading"><div><p class="eyebrow">가이드</p><h2 id="guideHeading">HOI4 자주 발생하는 문제</h2></div><a class="quiet-link" href="../guides.html">모든 가이드 보기 →</a></div>
+      <div id="guideGrid" class="guide-grid"></div>
+    </section>
+
+    <section class="feedback-strip"><div><strong>스캐너가 실제 문제를 놓쳤나요?</strong><span>실제 모딩 사례는 다음 기능을 정하는 데 가장 유용한 자료입니다.</span></div><a class="secondary-btn" href="../feedback.html">사례 공유</a></section>
+  </main>
+
+  <dialog id="logDialog" class="dialog"><div class="dialog-head"><div><p class="eyebrow">ERROR.LOG</p><h2>일반적인 위치</h2></div><button id="closeLogDialog" class="icon-btn" type="button" aria-label="닫기">×</button></div><p id="logPathText" class="path-box"></p><p class="subtle">문제를 한 번 재현한 직후의 최신 로그를 사용하세요. 다시 실행하면 로그 내용이 달라질 수 있습니다.</p></dialog>
+
+  <footer><div><strong>Paradox Doctor</strong><span>비공식 커뮤니티 도구이며 Paradox Interactive와 제휴 관계가 없습니다.</span></div><nav aria-label="하단 탐색"><a href="../regression.html">Regression</a><a href="../compatibility.html">Compatibility</a><a href="../guides.html">Guides</a><a href="../about.html">About</a><a href="../feedback.html">Feedback</a><a href="../privacy.html">Privacy</a><a href="../tools.html">Tools</a><a href="https://github.com/Reridy/paradox-doctor" target="_blank" rel="noopener">GitHub</a></nav></footer>
+  <script src="../app-core.js"></script>
+  <script src="../app-game-checks.js"></script>
+  <script src="../app-log-runner.js"></script>
+  <script src="../app-ui.js"></script>
+</body>
+</html>
